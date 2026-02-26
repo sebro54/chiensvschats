@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐱 Chats vs Chiens 🐶</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cat: #00dcff;
+    --cat-bg: #001833;
+    --dog: #ff5050;
+    --dog-bg: #330000;
+    --gold: #ffd93d;
+  }
+
+  body {
+    background: transparent; /* transparent pour OBS */
+    font-family: 'Nunito', sans-serif;
+    color: white;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── CONNEXION PANEL ── */
+  #connectPanel {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 1000;
+    padding: 30px;
+  }
+
+  #connectPanel h1 {
+    font-family: 'Bangers', cursive;
+    font-size: 48px;
+    text-align: center;
+    line-height: 1;
+  }
+
+  #connectPanel .subtitle {
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    font-size: 15px;
+    max-width: 360px;
+  }
+
+  .connect-form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  #usernameInput {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #usernameInput:focus { border-color: var(--cat); }
+  #usernameInput::placeholder { color: rgba(255,255,255,0.3); }
+
+  #connectBtn {
+    background: linear-gradient(135deg, #ff4f7b, #ff8c42);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 22px;
+    color: white;
+    font-family: 'Bangers', cursive;
+    font-size: 20px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  #connectStatus {
+    font-size: 14px;
+    color: var(--gold);
+    text-align: center;
+    min-height: 20px;
+  }
+
+  .gift-guide {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 16px 20px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .gift-guide h3 {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .gift-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .gift-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .gift-row .pts {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .gift-row.cat { color: var(--cat); }
+  .gift-row.dog { color: var(--dog); }
+
+  /* ── GAME SCREEN ── */
+  #gameScreen {
+    display: none;
+    width: 100%;
+    max-width: 500px;
+    flex-direction: column;
+    gap: 0;
+  }
+  #gameScreen.visible { display: flex; }
+
+  /* ARENA */
+  .arena {
+    position: relative;
+    height: 280px;
+    background: linear-gradient(180deg, #0a0a1a 0%, #110a22 50%, #0a1a0a 100%);
+    overflow: hidden;
+  }
+
+  .arena-glow-cats {
+    position: absolute;
+    left: 0; top: 0; width: 50%; height: 100%;
+    background: radial-gradient(ellipse at 25% 70%, rgba(0,220,255,0.15) 0%, transparent 60%);
+  }
+  .arena-glow-dogs {
+    position: absolute;
+    right: 0; top: 0; width: 50%; height: 100%;
+    background: radial-gradient(ellipse at 75% 70%, rgba(255,80,80,0.15) 0%, transparent 60%);
+  }
+
+  .divider {
+    position: absolute;
+    left: 50%; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+
+  .team-label {
+    position: absolute;
+    top: 14px;
+    font-family: 'Bangers', cursive;
+    font-size: 32px;
+    letter-spacing: 2px;
+    z-index: 5;
+  }
+  .team-label.cats { left: 14px; color: var(--cat); text-shadow: 0 0 20px var(--cat); }
+  .team-label.dogs { right: 14px; color: var(--dog); text-shadow: 0 0 20px var(--dog); }
+
+  .score-box {
+    position: absolute;
+    top: 54px;
+    padding: 3px 12px;
+    border-radius: 8px;
+    font-family: 'Bangers', cursive;
+    font-size: 26px;
+    min-width: 50px;
+    text-align: center;
+    z-index: 5;
+  }
+  .score-box.cats { left: 14px; border: 2px solid var(--cat); color: var(--cat); background: rgba(0,0,0,0.5); }
+  .score-box.dogs { right: 14px; border: 2px solid var(--dog); color: var(--dog); background: rgba(0,0,0,0.5); }
+
+  /* Progress */
+  .target-label {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Bangers', cursive;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
+  .progress-wrap {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    z-index: 5;
+  }
+
+  .progress-circle {
+    width: 80px; height: 80px;
+    position: relative;
+  }
+
+  .progress-circle svg {
+    transform: rotate(-90deg);
+    width: 80px; height: 80px;
+  }
+
+  .progress-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bangers', cursive;
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .character {
+    position: absolute;
+    bottom: 16px;
+    font-size: 70px;
+    z-index: 3;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    cursor: default;
+    user-select: none;
+  }
+  .character.cat { left: 50%; transform: translateX(-140px); }
+  .character.dog { right: 0; transform: translateX(-60px); }
+
+  .character.cat.winning { animation: catWin 0.6s infinite alternate; }
+  .character.dog.winning { animation: dogWin 0.6s infinite alternate; }
+  .character.cat.losing { filter: drop-shadow(0 0 0px transparent) grayscale(0.5); transform: translateX(-140px) scale(0.85); }
+  .character.dog.losing { filter: drop-shadow(0 0 0px transparent) grayscale(0.5); transform: translateX(-60px) scale(0.85); }
+
+  @keyframes catWin { from { transform: translateX(-140px) rotate(-8deg) scale(1.05); } to { transform: translateX(-140px) rotate(8deg) scale(1.15); } }
+  @keyframes dogWin { from { transform: translateX(-60px) rotate(8deg) scale(1.05); } to { transform: translateX(-60px) rotate(-8deg) scale(1.15); } }
+
+  /* Progress bar bottom */
+  .progress-bar-wrap {
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 6px;
+    background: rgba(0,0,0,0.4);
+    z-index: 6;
+  }
+  .progress-fill-cats {
+    position: absolute; left: 0; top: 0; height: 100%;
+    background: linear-gradient(90deg, var(--cat), #0088cc);
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .progress-fill-dogs {
+    position: absolute; right: 0; top: 0; height: 100%;
+    background: linear-gradient(270deg, var(--dog), #cc4400);
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ── CHAT ── */
+  .chat-section {
+    background: #0c0c18;
+    max-height: 280px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    max-height: 230px;
+    scrollbar-width: none;
+  }
+  .chat-messages::-webkit-scrollbar { display: none; }
+
+  .chat-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    animation: msgIn 0.25s ease;
+  }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .chat-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  .chat-username { font-size: 12px; color: #888; }
+  .chat-text { font-size: 14px; font-weight: 700; }
+  .chat-text.vote-cats { color: var(--cat); }
+  .chat-text.vote-dogs { color: var(--dog); }
+  .chat-text.gift-msg { color: var(--gold); }
+  .chat-text.neutral { color: rgba(255,255,255,0.75); }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    background: rgba(0,0,0,0.6);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #555;
+  }
+  .status-dot.live { background: #ff4040; animation: blink 1s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .status-text { font-size: 13px; color: #888; flex: 1; }
+
+  .reset-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 5px 14px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── FLOATING NOTIFICATIONS ── */
+  .float-zone {
+    position: fixed;
+    top: 20px; right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  .float-notif {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 15px;
+    animation: floatIn 0.4s ease, floatOut 0.4s ease 2.6s forwards;
+    max-width: 260px;
+    backdrop-filter: blur(10px);
+  }
+
+  .float-notif.cats { background: rgba(0,100,180,0.85); border: 1px solid var(--cat); }
+  .float-notif.dogs { background: rgba(150,0,0,0.85); border: 1px solid var(--dog); }
+
+  .float-pts {
+    margin-left: auto;
+    font-family: 'Bangers', cursive;
+    font-size: 22px;
+    color: var(--gold);
+  }
+
+  @keyframes floatIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes floatOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+  /* ── WINNER OVERLAY ── */
+  #winnerOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    animation: fadeIn 0.5s ease;
+  }
+  #winnerOverlay.show { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .winner-emoji { font-size: 90px; animation: bounce 0.7s infinite alternate; }
+  @keyframes bounce { from { transform: scale(1) rotate(-5deg); } to { transform: scale(1.15) rotate(5deg); } }
+
+  .winner-title {
+    font-family: 'Bangers', cursive;
+    font-size: 50px;
+    text-align: center;
+    line-height: 1;
+  }
+  .winner-title.cats { color: var(--cat); text-shadow: 0 0 30px var(--cat); }
+  .winner-title.dogs { color: var(--dog); text-shadow: 0 0 30px var(--dog); }
+
+  .winner-score { font-size: 18px; color: rgba(255,255,255,0.6); }
+
+  .winner-reset-btn {
+    background: linear-gradient(135deg, #ff4f7b, #ff8c42);
+    border: none;
+    border-radius: 20px;
+    padding: 14px 40px;
+    color: white;
+    font-family: 'Bangers', cursive;
+    font-size: 26px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- CONNEXION PANEL -->
+<div id="connectPanel">
+  <h1>🐱 Chats vs Chiens 🐶<br><span style="font-size:28px;color:rgba(255,255,255,0.5)">TikTok Live</span></h1>
+  <p class="subtitle">Saisis ton pseudo TikTok pour connecter le jeu à ton live</p>
+
+  <div class="connect-form">
+    <input type="text" id="usernameInput" placeholder="@ton_pseudo" />
+    <button id="connectBtn" onclick="connectTikTok()">CONNECT</button>
+  </div>
+  <div id="connectStatus">En attente de connexion...</div>
+
+  <div class="gift-guide">
+    <h3>⚙️ Configuration des points</h3>
+    <div class="gift-rows">
+      <div class="gift-row cat">🌹 Rose <span class="pts">+10 pts</span></div>
+      <div class="gift-row dog">🎵 TikTok <span class="pts">+10 pts</span></div>
+      <div class="gift-row cat">🦁 Lion <span class="pts">+500 pts</span></div>
+      <div class="gift-row dog">🚀 Rocket <span class="pts">+500 pts</span></div>
+      <div class="gift-row cat">💬 "chats" <span class="pts">+1 pt</span></div>
+      <div class="gift-row dog">💬 "chiens" <span class="pts">+1 pt</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+  <div class="arena">
+    <div class="arena-glow-cats"></div>
+    <div class="arena-glow-dogs"></div>
+    <div class="divider"></div>
+
+    <span class="team-label cats">🐱 CHATS</span>
+    <span class="team-label dogs">CHIENS 🐶</span>
+
+    <div class="score-box cats" id="catScore">0</div>
+    <div class="score-box dogs" id="dogScore">0</div>
+
+    <!-- Center progress rings -->
+    <div class="progress-wrap">
+      <div class="progress-circle">
+        <svg viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+          <circle id="catRing" cx="40" cy="40" r="32" fill="none" stroke="#00dcff" stroke-width="6"
+            stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round"/>
+          <circle id="dogRing" cx="40" cy="40" r="32" fill="none" stroke="#ff5050" stroke-width="6"
+            stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round"
+            style="transform: rotate(180deg); transform-origin: 40px 40px;"/>
+        </svg>
+        <div class="progress-center" id="progressCenter">1000<br>pts</div>
+      </div>
+    </div>
+
+    <div class="character cat" id="catChar">🐱</div>
+    <div class="character dog" id="dogChar">🐶</div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-fill-cats" id="catBar" style="width:0%"></div>
+      <div class="progress-fill-dogs" id="dogBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-section">
+    <div class="chat-messages" id="chatMessages"></div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-dot live" id="statusDot"></div>
+    <div class="status-text" id="statusText">Connecté</div>
+    <button class="reset-btn" onclick="resetGame()">🔄 Reset</button>
+  </div>
+</div>
+
+<!-- FLOATING NOTIFICATIONS -->
+<div class="float-zone" id="floatZone"></div>
+
+<!-- WINNER OVERLAY -->
+<div id="winnerOverlay">
+  <div class="winner-emoji" id="winnerEmoji"></div>
+  <div class="winner-title" id="winnerTitle"></div>
+  <div class="winner-score" id="winnerScore"></div>
+  <button class="winner-reset-btn" onclick="resetGame()">🔄 REJOUER</button>
+</div>
+
+<script>
+  const socket = io();
+  let gameState = { catPoints: 0, dogPoints: 0, winner: null, running: false, targetPoints: 1000 };
+
+  // ── CONNEXION ──
+  function connectTikTok() {
+    let username = document.getElementById('usernameInput').value.trim().replace('@', '');
+    if (!username) return;
+    document.getElementById('connectStatus').textContent = `⏳ Connexion à @${username}...`;
+    document.getElementById('connectBtn').disabled = true;
+    socket.emit('connect_tiktok', { username });
+  }
+
+  document.getElementById('usernameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') connectTikTok();
+  });
+
+  // ── SOCKET EVENTS ──
+  socket.on('connected', ({ username }) => {
+    document.getElementById('connectPanel').style.display = 'none';
+    document.getElementById('gameScreen').classList.add('visible');
+    document.getElementById('statusText').textContent = `@${username} • LIVE 🔴`;
+    addSystemMsg(`🔴 Connecté au live de @${username}`);
+  });
+
+  socket.on('connectionError', ({ message }) => {
+    document.getElementById('connectStatus').textContent = `❌ Erreur : ${message}`;
+    document.getElementById('connectBtn').disabled = false;
+  });
+
+  socket.on('disconnected', () => {
+    document.getElementById('statusText').textContent = 'Déconnecté';
+    document.getElementById('statusDot').classList.remove('live');
+  });
+
+  socket.on('gameState', (state) => {
+    gameState = state;
+    updateUI();
+    if (state.winner) showWinner(state.winner);
+  });
+
+  socket.on('chatVote', ({ team, username, message }) => {
+    addChatMsg(username, message, `vote-${team}`);
+  });
+
+  socket.on('chatMessage', ({ username, message }) => {
+    addChatMsg(username, message, 'neutral');
+  });
+
+  socket.on('giftReceived', ({ team, username, giftName, emoji, points, repeatCount }) => {
+    const label = repeatCount > 1 ? `${emoji} ${giftName} x${repeatCount} → +${points} pts` : `${emoji} ${giftName} → +${points} pts`;
+    addChatMsg(username, label, 'gift-msg');
+    showFloatNotif(team, username, emoji, giftName, points);
+  });
+
+  socket.on('pointsAdded', ({ team, points, source, username }) => {
+    if (source === 'gift') return; // géré par giftReceived
+    if (source === 'chat') {
+      // Petite animation flash sur le score
+      const el = document.getElementById(team === 'cats' ? 'catScore' : 'dogScore');
+      el.style.transform = 'scale(1.3)';
+      setTimeout(() => el.style.transform = '', 200);
+    }
+  });
+
+  // ── UI UPDATE ──
+  function updateUI() {
+    const { catPoints, dogPoints, targetPoints } = gameState;
+    document.getElementById('catScore').textContent = catPoints;
+    document.getElementById('dogScore').textContent = dogPoints;
+
+    const total = targetPoints;
+    const catPct = Math.min(catPoints / total, 1);
+    const dogPct = Math.min(dogPoints / total, 1);
+
+    // Bottom bars (each max 50%)
+    document.getElementById('catBar').style.width = (catPct * 50) + '%';
+    document.getElementById('dogBar').style.width = (dogPct * 50) + '%';
+
+    // SVG rings
+    const circumference = 201;
+    document.getElementById('catRing').style.strokeDashoffset = circumference * (1 - catPct / 2);
+    document.getElementById('dogRing').style.strokeDashoffset = circumference * (1 - dogPct / 2);
+
+    // Center label
+    const leading = catPoints > dogPoints ? '🐱' : dogPoints > catPoints ? '🐶' : '⚔️';
+    document.getElementById('progressCenter').innerHTML = `${leading}<br><span style="font-size:11px;color:rgba(255,255,255,0.5)">${targetPoints} pts</span>`;
+
+    // Characters
+    const catChar = document.getElementById('catChar');
+    const dogChar = document.getElementById('dogChar');
+    catChar.className = 'character cat' + (catPoints > dogPoints ? ' winning' : catPoints < dogPoints ? ' losing' : '');
+    dogChar.className = 'character dog' + (dogPoints > catPoints ? ' winning' : dogPoints < catPoints ? ' losing' : '');
+  }
+
+  // ── CHAT ──
+  const avatarEmojis = ['🎮','⚡','🌟','🔥','✨','💫','🎯','🌈','🦋','🎲'];
+  const avatarColors = ['#667eea','#764ba2','#f093fb','#f5576c','#4facfe','#43e97b','#fa709a','#fee140','#a18cd1','#ff9a9e'];
+
+  function addChatMsg(username, text, type) {
+    const chat = document.getElementById('chatMessages');
+    const emoji = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+    const color = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `
+      <div class="chat-avatar" style="background:${color}">${emoji}</div>
+      <div>
+        <div class="chat-username">${escHtml(username)}</div>
+        <div class="chat-text ${type}">${escHtml(text)}</div>
+      </div>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    while (chat.children.length > 40) chat.removeChild(chat.firstChild);
+  }
+
+  function addSystemMsg(text) {
+    const chat = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `<div class="chat-text neutral" style="font-size:13px;color:#555;padding-left:4px">${escHtml(text)}</div>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── FLOAT NOTIFICATION ──
+  function showFloatNotif(team, username, emoji, giftName, points) {
+    const zone = document.getElementById('floatZone');
+    const div = document.createElement('div');
+    div.className = `float-notif ${team}`;
+    div.innerHTML = `
+      <span>${emoji}</span>
+      <span style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(username)}</span>
+      <span style="font-size:12px;color:rgba(255,255,255,0.6)">${giftName}</span>
+      <span class="float-pts">+${points}</span>`;
+    zone.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+  }
+
+  // ── WINNER ──
+  function showWinner(winner) {
+    const overlay = document.getElementById('winnerOverlay');
+    const title = document.getElementById('winnerTitle');
+    const emoji = document.getElementById('winnerEmoji');
+    const score = document.getElementById('winnerScore');
+
+    if (winner === 'cats') {
+      emoji.textContent = '🐱';
+      title.textContent = 'LES CHATS GAGNENT !';
+      title.className = 'winner-title cats';
+    } else {
+      emoji.textContent = '🐶';
+      title.textContent = 'LES CHIENS GAGNENT !';
+      title.className = 'winner-title dogs';
+    }
+    score.textContent = `Chats: ${gameState.catPoints} pts  |  Chiens: ${gameState.dogPoints} pts`;
+    overlay.classList.add('show');
+  }
+
+  // ── RESET ──
+  function resetGame() {
+    document.getElementById('winnerOverlay').classList.remove('show');
+    document.getElementById('chatMessages').innerHTML = '';
+    socket.emit('reset_game');
+  }
+</script>
+</body>
+</html>
