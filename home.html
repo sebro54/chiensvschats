@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Games</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f8f7f4;
+  --ink: #0f0f0f;
+  --muted: #7a7a72;
+  --line: #e2e0da;
+  --battle-accent: #1a1a1a;
+  --quiz-accent: #2d5a27;
+  --live: #e63b2e;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-left {}
+
+.site-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.site-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--live);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 100px;
+  flex-shrink: 0;
+  margin-bottom: 6px;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: white;
+  animation: blink 1.2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── SECTION ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── CARDS ── */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: translate(-2px, -2px);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.card-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.card-meta {
+  display: flex;
+  gap: 16px;
+}
+
+.meta-item {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-cta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap 0.2s;
+}
+.card:hover .card-cta { gap: 10px; }
+
+/* Card accents */
+.card.battle { border-left: 3px solid var(--ink); }
+.card.quiz   { border-left: 3px solid var(--quiz-accent); }
+.card.quiz .card-title { color: var(--quiz-accent); }
+.card.quiz .card-cta   { color: var(--quiz-accent); }
+.card.quiz:hover { border-color: var(--quiz-accent); box-shadow: 4px 4px 0 var(--quiz-accent); }
+
+/* Coming soon */
+.card.soon {
+  background: var(--bg);
+  cursor: default;
+  border-left: 3px solid var(--line);
+}
+.card.soon:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.card.soon .card-title { color: var(--muted); }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+.divider-line { flex:1; height:1px; background: var(--line); }
+.divider-text { font-size:11px; color:var(--muted); font-weight:500; letter-spacing:1px; }
+
+/* ── FOOTER ── */
+footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-text {
+  font-size: 12px;
+  color: var(--muted);
+}
+.footer-paw {
+  font-size: 18px;
+  opacity: 0.3;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="header-left">
+      <div class="site-label">TikTok Interactive</div>
+      <div class="site-title">Live<br>Games</div>
+    </div>
+    <div class="live-pill">
+      <div class="live-dot"></div>
+      En direct
+    </div>
+  </header>
+
+  <div class="section-header">
+    <div class="section-title">Choisir un jeu</div>
+    <div class="section-count">2 disponibles</div>
+  </div>
+
+  <div class="cards">
+
+    <a href="/game-battle" class="card battle">
+      <div class="card-top">
+        <div class="card-tag">⚡ Live Battle</div>
+        <div class="card-icon">🐱🐶</div>
+      </div>
+      <div class="card-title">Chats vs Chiens</div>
+      <div class="card-desc">Les viewers choisissent leur camp et votent via messages ou cadeaux. Première équipe à 1 000 points remporte la bataille.</div>
+      <div class="card-bottom">
+        <div class="card-meta">
+          <div class="meta-item">🌹 Rose = 10 pts</div>
+          <div class="meta-item">🦁 Lion = 500 pts</div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+    </a>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">ou</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <a href="/game-quiz" class="card quiz">
+      <div class="card-top">
+        <div class="card-tag">🎓 Révision</div>
+        <div class="card-icon">🧠</div>
+      </div>
+      <div class="card-title">Quiz ACACED<br>Chiens & Chats</div>
+      <div class="card-desc">Questions officielles pour préparer votre certification. Les viewers répondent A, B, C ou D dans le chat — leurs votes s'affichent en direct.</div>
+      <div class="card-bottom">
+        <div class="card-meta">
+          <div class="meta-item">📋 QCM</div>
+          <div class="meta-item">⏱ 30s / question</div>
+          <div class="meta-item">🏆 Classement</div>
+        </div>
+        <div class="card-cta">Jouer →</div>
+      </div>
+    </a>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">bientôt</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="card soon">
+      <div class="card-top">
+        <div class="card-tag">En développement</div>
+        <div class="card-icon">🎯</div>
+      </div>
+      <div class="card-title">Prochain jeu</div>
+      <div class="card-desc">D'autres expériences interactives arrivent prochainement.</div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-text">Propulsé par EulerStream & TikTok Live</div>
+    <div class="footer-paw">🐾</div>
+  </footer>
+
+</div>
+</body>
+</html>

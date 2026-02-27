@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Chiens & Chats 🐾</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f8f7f4;--ink:#0f0f0f;--muted:#7a7a72;--line:#e2e0da;
+  --green:#2d5a27;--gl:#eef4ed;--red:#e63b2e;--rl:#fdf0ef;
+  --gold:#b87c00;--goldl:#fdf6e7;--purple:#6d28d9;
+  --A:#1d4ed8;--B:#c2410c;--C:#6d28d9;--D:#0f766e;
+}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
+.wrap{max-width:500px;margin:0 auto;width:100%}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.tb-left{display:flex;align-items:center;gap:10px}
+.back{font-size:12px;font-weight:600;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--ink)}
+.tb-div{width:1px;height:14px;background:var(--line)}
+.tb-title{font-size:13px;font-weight:600}
+.tb-badge{font-size:12px;font-weight:700;color:var(--green);background:var(--gl);border:1px solid rgba(45,90,39,.15);border-radius:100px;padding:4px 12px}
+
+/* INPUTS / BUTTONS */
+.inp{width:100%;background:white;border:1px solid var(--line);border-radius:10px;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--green)}
+.inp::placeholder{color:var(--muted)}
+.inp-sm{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none}
+.inp-sm::placeholder{color:var(--muted)}
+.lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.btn-g{width:100%;background:var(--green);border:none;border-radius:10px;padding:14px;color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn-g:hover{opacity:.88}
+.btn-g:disabled{opacity:.35;cursor:default}
+.btn-muted{width:100%;background:white;border:1px solid var(--line);border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:border-color .15s,color .15s}
+.btn-muted:hover{border-color:var(--ink);color:var(--ink)}
+.divrow{display:flex;align-items:center;gap:12px}
+.dl{flex:1;height:1px;background:var(--line)}
+.dt{font-size:12px;color:var(--muted)}
+
+/* ═══ STEP CONNECT ═══ */
+#sConnect{padding:36px 20px;display:flex;flex-direction:column;gap:16px}
+.hero{text-align:center;margin-bottom:6px}
+.hero-ico{font-size:52px;display:block;margin-bottom:14px}
+.hero h2{font-family:'DM Serif Display',serif;font-size:30px;color:var(--ink);line-height:1.2;margin-bottom:8px}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6}
+#cStatus{font-size:13px;color:var(--muted);text-align:center;min-height:16px}
+.cookie-box{background:white;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.cookie-ttl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.cookie-note{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ═══ STEP REGISTER ═══ */
+#sRegister{display:none;padding-bottom:40px}
+.reg-hd{padding:28px 20px 20px;text-align:center;border-bottom:1px solid var(--line)}
+.reg-hd h2{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:6px}
+.reg-hd p{font-size:13px;color:var(--muted);line-height:1.5}
+.rule-box{margin:18px 20px 0;background:var(--goldl);border:1px solid rgba(184,124,0,.2);border-left:3px solid var(--gold);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.rule-ico{font-size:22px;flex-shrink:0}
+.rule-ttl{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:3px;letter-spacing:.4px}
+.rule-txt{font-size:13px;color:var(--ink);line-height:1.5}
+.rule-txt strong{color:var(--gold)}
+.sabotage-box{margin:14px 20px 0;background:#faf0ff;border:1px solid rgba(109,40,217,.2);border-left:3px solid var(--purple);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.sabotage-ttl{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:3px}
+.sabotage-txt{font-size:13px;color:var(--ink);line-height:1.5}
+.sabotage-txt strong{color:var(--purple)}
+
+/* Timer d'inscription */
+.rtimer-wrap{margin:18px 20px 0;text-align:center}
+.rtimer-lbl{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.rtimer{font-family:'DM Serif Display',serif;font-size:60px;line-height:1;color:var(--green);transition:color .3s}
+.rtimer.urgent{color:var(--red);animation:tpulse .6s infinite alternate}
+@keyframes tpulse{from{transform:scale(1)}to{transform:scale(1.06)}}
+.rtimer-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* Participants */
+.p-wrap{margin:16px 20px 0}
+.p-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.p-ttl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.p-cnt{font-size:12px;font-weight:700;color:var(--green);background:var(--gl);border-radius:100px;padding:3px 11px}
+.p-list{background:white;border:1px solid var(--line);border-radius:12px;max-height:200px;overflow-y:auto;scrollbar-width:none}
+.p-list::-webkit-scrollbar{display:none}
+.p-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);animation:slideIn .3s ease}
+.p-row:last-child{border:none}
+@keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.p-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.p-name{font-size:13px;font-weight:600;flex:1}
+.p-gift{font-size:11px;font-weight:500;color:var(--green);background:var(--gl);border-radius:100px;padding:2px 9px}
+.p-empty{padding:28px;text-align:center;font-size:13px;color:var(--muted)}
+
+/* Start */
+.start-wrap{margin:16px 20px 0}
+.start-btn{width:100%;background:var(--ink);border:none;border-radius:10px;padding:15px;color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.start-btn:hover:not(:disabled){opacity:.82}
+.start-btn:disabled{opacity:.3;cursor:default}
+
+/* Chat reg */
+.reg-chat{margin-top:20px;border-top:1px solid var(--line);background:white}
+.chat-msgs{padding:8px 20px;max-height:100px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;scrollbar-width:none}
+.chat-msgs::-webkit-scrollbar{display:none}
+
+/* ═══ STEP QUIZ ═══ */
+#sQuiz{display:none;padding-bottom:40px}
+.progress-wrap{padding:14px 20px 0;display:flex;align-items:center;gap:10px}
+.p-track{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.p-fill{height:100%;background:var(--green);border-radius:2px;transition:width .6s ease}
+.p-lbl{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+
+.q-wrap{padding:18px 20px 0}
+.q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.q-cat{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);background:var(--gl);border-radius:100px;padding:4px 11px}
+.q-timer{font-family:'DM Serif Display',serif;font-size:26px;color:var(--gold);transition:color .3s;min-width:36px;text-align:right}
+.q-timer.urgent{color:var(--red);animation:qpulse .5s infinite alternate}
+@keyframes qpulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+.q-txt{font-family:'DM Serif Display',serif;font-size:19px;line-height:1.45;color:var(--ink);margin-bottom:18px}
+
+/* Answers */
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ans{background:white;border:1.5px solid var(--line);border-radius:12px;padding:13px 11px 11px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:3px}
+.ans:hover:not(:disabled){border-color:var(--ink);background:#fafaf8}
+.ans:disabled{cursor:default}
+.ans-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.ans[data-l="A"] .ans-lbl{color:var(--A)}
+.ans[data-l="B"] .ans-lbl{color:var(--B)}
+.ans[data-l="C"] .ans-lbl{color:var(--C)}
+.ans[data-l="D"] .ans-lbl{color:var(--D)}
+.ans-txt{font-size:12px;font-weight:500;color:var(--ink);line-height:1.35}
+.ans-votes{font-size:10px;font-weight:600;color:var(--muted);margin-top:1px}
+.v-bar{position:absolute;bottom:0;left:0;height:3px;width:0%;border-radius:0 0 10px 10px;transition:width .4s ease}
+.ans[data-l="A"] .v-bar{background:var(--A)}
+.ans[data-l="B"] .v-bar{background:var(--B)}
+.ans[data-l="C"] .v-bar{background:var(--C)}
+.ans[data-l="D"] .v-bar{background:var(--D)}
+.ans.correct{background:var(--gl)!important;border-color:var(--green)!important}
+.ans.wrong{background:var(--rl)!important;border-color:var(--red)!important;opacity:.55}
+
+/* Explication */
+.expl{display:none;margin:14px 20px 0;background:white;border:1px solid var(--line);border-left:3px solid var(--green);border-radius:12px;padding:14px 16px}
+.expl.show{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.expl-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.expl-txt{font-size:13px;color:var(--ink);line-height:1.6}
+
+/* Next */
+.next-wrap{padding:14px 20px 0;display:none}
+.next-wrap.show{display:block}
+.next-btn{width:100%;background:var(--ink);border:none;border-radius:10px;padding:14px;color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.next-btn:hover{opacity:.85}
+
+/* Sabotage notif */
+.sabo-notif{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:100;background:#6d28d9;color:white;font-size:13px;font-weight:600;padding:10px 20px;border-radius:100px;animation:notifIn .3s ease;white-space:nowrap;pointer-events:none}
+@keyframes notifIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Leaderboard live */
+.lb-wrap{margin:18px 20px 0;background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:none}
+.lb-wrap.show{display:block}
+.lb-hd{padding:10px 14px;border-bottom:1px solid var(--line);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line)}
+.lb-row:last-child{border:none}
+.lb-rank{font-size:16px;width:24px;text-align:center}
+.lb-name{font-size:13px;font-weight:600;flex:1;color:var(--ink)}
+.lb-score{font-family:'DM Serif Display',serif;font-size:18px;color:var(--green)}
+.lb-row.me .lb-name::after{content:' (toi)';font-size:10px;color:var(--muted);font-weight:400}
+
+/* Chat quiz */
+.chat-wrap{margin-top:20px;border-top:1px solid var(--line);background:white}
+.chat-inner{padding:10px 20px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;scrollbar-width:none}
+.chat-inner::-webkit-scrollbar{display:none}
+.c-msg{display:flex;align-items:flex-start;gap:8px;animation:msgIn .2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.c-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0}
+.c-user{font-size:10px;font-weight:600;color:var(--muted)}
+.c-txt{font-size:13px;font-weight:500}
+.c-a{color:var(--A)}.c-b{color:var(--B)}.c-c{color:var(--C)}.c-d{color:var(--D)}
+.c-neutral{color:var(--ink)}.c-sabo{color:var(--purple);font-weight:700}
+.status-bar{display:flex;align-items:center;gap:7px;padding:9px 20px;border-top:1px solid var(--line)}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.s-dot.live{background:var(--red);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.s-txt{font-size:11px;font-weight:500;color:var(--muted)}
+
+/* ═══ STEP END ═══ */
+#sEnd{display:none;position:relative;overflow:hidden}
+#sEnd.show{display:block}
+#confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100}
+.end-wrap{padding:44px 20px 60px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;position:relative;z-index:1}
+.podium{display:flex;flex-direction:column;align-items:center;gap:8px;animation:podiumIn .8s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes podiumIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.trophy{font-size:80px;filter:drop-shadow(0 4px 20px rgba(184,124,0,.4));animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+.end-title{font-family:'DM Serif Display',serif;font-size:36px;color:var(--ink)}
+.end-sub{font-size:14px;color:var(--muted);line-height:1.5}
+
+/* Champion card */
+.champ-card{width:100%;background:linear-gradient(135deg,#fdf6e7,#fff9f0);border:2px solid var(--gold);border-radius:16px;padding:24px;animation:fadeUp .6s ease .3s both}
+.champ-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.champ-av{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;margin:0 auto 10px}
+.champ-name{font-family:'DM Serif Display',serif;font-size:28px;color:var(--ink)}
+.champ-score{font-size:16px;font-weight:700;color:var(--gold);margin-top:4px}
+.champ-detail{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* End stats */
+.end-stats{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;animation:fadeUp .6s ease .5s both}
+.stat-c{background:white;border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
+.stat-n{font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);line-height:1}
+.stat-l{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+/* Podium top 3 */
+.podium3{width:100%;background:white;border:1px solid var(--line);border-radius:14px;overflow:hidden;animation:fadeUp .6s ease .7s both}
+.pod-hd{padding:10px 14px;border-bottom:1px solid var(--line);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.pod-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+.pod-row:last-child{border:none}
+.pod-med{font-size:22px;width:28px;text-align:center}
+.pod-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white}
+.pod-info{flex:1}
+.pod-name{font-size:14px;font-weight:700}
+.pod-detail{font-size:11px;color:var(--muted);margin-top:2px}
+.pod-pts{font-family:'DM Serif Display',serif;font-size:22px;color:var(--green)}
+.pod-row:first-child .pod-pts{color:var(--gold)}
+
+.end-actions{width:100%;display:flex;flex-direction:column;gap:10px;animation:fadeUp .6s ease .9s both}
+.replay-btn{width:100%;background:var(--ink);border:none;border-radius:10px;padding:14px;color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.replay-btn:hover{opacity:.85}
+.home-link{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none}
+.home-link:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <a href="/" class="back">← Accueil</a>
+      <div class="tb-div"></div>
+      <div class="tb-title">🐾 Quiz Chiens & Chats</div>
+    </div>
+    <div class="tb-badge" id="tbBadge">0 inscrits</div>
+  </div>
+
+  <!-- ═══ ÉTAPE 1 : CONNEXION ═══ -->
+  <div id="sConnect">
+    <div class="hero">
+      <span class="hero-ico">🐾</span>
+      <h2>Quiz Chiens<br>& Chats</h2>
+      <p>50 questions de révision sur les chiens et les chats. Connecte ton TikTok Live pour jouer avec tes viewers !</p>
+    </div>
+    <div>
+      <label class="lbl">Pseudo TikTok</label>
+      <input class="inp" id="uInput" placeholder="@ton_pseudo" onkeydown="if(event.key==='Enter')doConnect()" />
+    </div>
+    <button class="btn-g" onclick="doConnect()">🔴 Connecter le live</button>
+    <div id="cStatus"></div>
+    <div class="divrow"><div class="dl"></div><div class="dt">ou</div><div class="dl"></div></div>
+    <button class="btn-muted" onclick="startSolo()">Mode solo — sans TikTok</button>
+    <div class="cookie-box">
+      <div class="cookie-ttl">🍪 Cookies si erreur 403</div>
+      <input class="inp-sm" id="sessInput" placeholder="sessionid" />
+      <input class="inp-sm" id="idcInput" placeholder="tt-target-idc" />
+      <div class="cookie-note">F12 → Application → Cookies → tiktok.com</div>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 2 : INSCRIPTION ═══ -->
+  <div id="sRegister">
+    <div class="reg-hd">
+      <h2>Phase d'inscription 🎁</h2>
+      <p>Les viewers envoient un cadeau pour rejoindre la partie. Seul le premier sera couronné champion !</p>
+    </div>
+
+    <div class="rule-box">
+      <div class="rule-ico">🎁</div>
+      <div>
+        <div class="rule-ttl">Pour s'inscrire</div>
+        <div class="rule-txt">Envoie un cadeau de <strong>50 coins minimum</strong> pour rejoindre le quiz !</div>
+      </div>
+    </div>
+
+    <div class="sabotage-box">
+      <div class="rule-ico">⚡</div>
+      <div>
+        <div class="sabotage-ttl">Pouvoir de sabotage</div>
+        <div class="sabotage-txt">Envoie un cadeau de <strong>500 coins ou plus</strong> pendant le quiz pour faire perdre <strong>-10 pts</strong> au joueur en tête !</div>
+      </div>
+    </div>
+
+    <div class="rtimer-wrap">
+      <div class="rtimer-lbl">Temps pour s'inscrire</div>
+      <div class="rtimer" id="rTimer">60</div>
+      <div class="rtimer-sub" id="rTimerSub">secondes</div>
+    </div>
+
+    <div class="p-wrap">
+      <div class="p-hd">
+        <div class="p-ttl">Participants</div>
+        <div class="p-cnt" id="pCount">0</div>
+      </div>
+      <div class="p-list" id="pList">
+        <div class="p-empty" id="pEmpty">En attente de cadeaux... 🎁</div>
+      </div>
+    </div>
+
+    <div class="start-wrap">
+      <button class="start-btn" id="startBtn" onclick="launchQuiz()" disabled>
+        <span>🚀 Démarrer le quiz</span><span id="startBtnSub">(0 participant)</span>
+      </button>
+    </div>
+
+    <div class="reg-chat">
+      <div class="chat-msgs" id="regChat"></div>
+      <div class="status-bar">
+        <div class="s-dot live"></div>
+        <div class="s-txt" id="regStatus">En attente de cadeaux...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 3 : QUIZ ═══ -->
+  <div id="sQuiz">
+    <div class="progress-wrap">
+      <div class="p-track"><div class="p-fill" id="pFill" style="width:0%"></div></div>
+      <div class="p-lbl" id="pLbl">1 / 50</div>
+    </div>
+    <div class="q-wrap">
+      <div class="q-meta">
+        <div class="q-cat" id="qCat"></div>
+        <div class="q-timer" id="qTimer">30</div>
+      </div>
+      <div class="q-txt" id="qTxt"></div>
+      <div class="answers" id="answersGrid"></div>
+    </div>
+    <div class="expl" id="expl">
+      <div class="expl-lbl">💡 Explication</div>
+      <div class="expl-txt" id="explTxt"></div>
+    </div>
+    <div class="next-wrap" id="nextWrap">
+      <button class="next-btn" onclick="nextQ()">Question suivante →</button>
+    </div>
+    <div class="lb-wrap" id="lb">
+      <div class="lb-hd">🏆 Classement en direct</div>
+      <div id="lbRows"></div>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-inner" id="chatQ"></div>
+      <div class="status-bar">
+        <div class="s-dot live"></div>
+        <div class="s-txt" id="qStatus">En direct</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 4 : FIN ═══ -->
+  <div id="sEnd">
+    <div class="end-wrap">
+      <div class="podium">
+        <div class="trophy">🏆</div>
+        <div class="end-title">Quiz terminé !</div>
+        <div class="end-sub" id="endSub"></div>
+      </div>
+      <div class="champ-card" id="champCard" style="display:none">
+        <div class="champ-lbl">👑 Champion du quiz</div>
+        <div class="champ-av" id="champAv"></div>
+        <div class="champ-name" id="champName"></div>
+        <div class="champ-score" id="champScore"></div>
+        <div class="champ-detail" id="champDetail"></div>
+      </div>
+      <div class="end-stats" id="endStats">
+        <div class="stat-c"><div class="stat-n" id="statP">0</div><div class="stat-l">Participants</div></div>
+        <div class="stat-c"><div class="stat-n" id="statQ">50</div><div class="stat-l">Questions</div></div>
+        <div class="stat-c"><div class="stat-n" id="statTop">0</div><div class="stat-l">Meilleur score</div></div>
+      </div>
+      <div class="podium3" id="podium3" style="display:none">
+        <div class="pod-hd">🎖️ Top 3</div>
+        <div id="podRows"></div>
+      </div>
+      <div class="end-actions">
+        <button class="replay-btn" onclick="doRestart()">🔄 Rejouer</button>
+        <a href="/" class="home-link">← Retour à l'accueil</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+// ═══════════════════════════════
+// DONNÉES
+// ═══════════════════════════════
+var ALL_QUESTIONS = [{"cat":"Réglementation","q":"L’âge minimum légal de cession d’un chiot ou d’un chaton est de :","a":{"A":"6 semaines","B":"8 semaines","C":"7 semaines","D":"10 semaines"},"ok":"B","expl":"Le Code rural fixe l’âge minimum de cession à plus de 8 semaines."},{"cat":"Réglementation","q":"La cession d’un chien ou d’un chat à un mineur est :","a":{"A":"Autorisée seulement si l’animal est identifié","B":"Toujours autorisée","C":"Interdite dans tous les cas","D":"Interdite sans consentement des parents ou de l’autorité parentale"},"ok":"D","expl":"Le consentement parental est requis."},{"cat":"Réglementation","q":"Un chien ou un chat peut être présenté comme « de race » seulement s’il est :","a":{"A":"Né chez un éleveur","B":"Titulaire d’un passeport","C":"Inscrit à un livre généalogique reconnu","D":"Issu de parents vaccinés"},"ok":"C","expl":"La notion de race suppose une inscription à un livre généalogique reconnu."},{"cat":"Réglementation","q":"Le délai minimal entre la signature du certificat d’engagement et l’acquisition d’un chien ou d’un chat est de :","a":{"A":"3 jours","B":"48 heures","C":"7 jours","D":"15 jours"},"ok":"C","expl":"Le délai de réflexion légal est de 7 jours."},{"cat":"Réglementation","q":"En France, l’identification d’un chien doit être réalisée au plus tard :","a":{"A":"Avant 4 mois","B":"Avant 12 mois","C":"Avant 7 mois","D":"Avant 2 mois"},"ok":"A","expl":"Le chien doit être identifié avant 4 mois et avant toute cession."},{"cat":"Réglementation","q":"En France, l’identification d’un chat doit être réalisée au plus tard :","a":{"A":"Avant 7 mois","B":"Avant 3 mois","C":"Avant 4 mois","D":"Avant 12 mois"},"ok":"A","expl":"Le chat doit être identifié avant 7 mois et avant toute cession."},{"cat":"Réglementation","q":"Après morsure d’une personne par un chien, la surveillance sanitaire réglementaire correspond à :","a":{"A":"2 visites sur 7 jours","B":"4 visites sur 30 jours","C":"1 visite vétérinaire","D":"3 visites sur 15 jours"},"ok":"D","expl":"La surveillance comprend 3 visites auprès du même vétérinaire sur 15 jours."},{"cat":"Réglementation","q":"Après morsure d’une personne, la première visite vétérinaire doit être réalisée :","a":{"A":"À J7","B":"À J15","C":"Dans les 24 heures","D":"À J3"},"ok":"C","expl":"La première visite doit avoir lieu dans les 24 heures suivant la morsure."},{"cat":"Réglementation","q":"Après morsure d’une personne, la deuxième visite vétérinaire doit être réalisée au plus tard :","a":{"A":"À J5","B":"À J7","C":"À J2","D":"À J15"},"ok":"B","expl":"La seconde visite doit intervenir au plus tard 7 jours après la morsure."},{"cat":"Réglementation","q":"Après morsure d’une personne, la troisième visite vétérinaire est réalisée :","a":{"A":"À J12","B":"À J30","C":"À J15","D":"À J10"},"ok":"C","expl":"La troisième visite réglementaire a lieu le 15e jour."},{"cat":"Réglementation","q":"En cas de morsure par un chien, la déclaration doit être adressée :","a":{"A":"À la préfecture uniquement","B":"À l’I-CAD uniquement","C":"À la mairie de la commune de résidence du détenteur","D":"À la SPA"},"ok":"C","expl":"La déclaration de morsure est faite en mairie."},{"cat":"Réglementation","q":"La détention d’un chien de 1re ou 2e catégorie nécessite notamment :","a":{"A":"Une autorisation de la DDPP uniquement","B":"Un permis de chasse","C":"Un certificat sanitaire annuel unique","D":"Un permis de détention"},"ok":"D","expl":"Le détenteur doit notamment obtenir un permis de détention."},{"cat":"Réglementation","q":"Pour un chien de 1re catégorie sur la voie publique, l’obligation correcte est :","a":{"A":"Libre sans laisse si muselé","B":"Sans muselière si sociable","C":"Libre s’il est stérilisé","D":"Tenu en laisse par une personne majeure et muselé"},"ok":"D","expl":"Les chiens de 1re catégorie doivent être muselés et tenus en laisse par une personne majeure."},{"cat":"Réglementation","q":"L’accès aux transports en commun d’un chien de 1re catégorie est :","a":{"A":"Autorisé seulement en cage","B":"Libre s’il est muselé","C":"Autorisé avec permis provisoire","D":"Interdit"},"ok":"D","expl":"Les chiens de 1re catégorie n’ont pas accès aux transports en commun."},{"cat":"Réglementation","q":"Le permis de détention d’un chien catégorisé est délivré par :","a":{"A":"L’I-CAD","B":"Le vétérinaire sanitaire","C":"La DDPP","D":"La mairie de la commune de résidence"},"ok":"D","expl":"Le permis est délivré par le maire (ou la préfecture de police à Paris)."},{"cat":"Réglementation","q":"Pour un chien catégorisé de moins de 8 mois, le détenteur peut obtenir :","a":{"A":"Un permis définitif uniquement","B":"Un permis provisoire","C":"Aucun document avant 12 mois","D":"Une simple attestation orale"},"ok":"B","expl":"Un permis provisoire est prévu tant que l’évaluation comportementale ne peut pas être réalisée."},{"cat":"Réglementation","q":"L’attestation d’aptitude liée aux chiens catégorisés porte sur :","a":{"A":"Le toilettage","B":"La reproduction canine","C":"L’éducation, le comportement canin et la prévention des accidents","D":"La nutrition du chiot"},"ok":"C","expl":"La formation obligatoire porte sur l’éducation/comportement et la prévention des accidents."},{"cat":"Réglementation","q":"La durée de validité de l’ACACED est de :","a":{"A":"10 ans","B":"2 ans","C":"Illimitée","D":"5 ans"},"ok":"A","expl":"La validité est de 10 ans."},{"cat":"Réglementation","q":"L’actualisation des connaissances liée à l’ACACED doit être réalisée au plus tard :","a":{"A":"Tous les ans","B":"Uniquement en cas de contrôle","C":"10 ans après la date de référence","D":"Tous les 5 ans"},"ok":"C","expl":"L’actualisation est prévue au plus tard 10 ans après."},{"cat":"Réglementation","q":"Les carnivores domestiques reconnus par la réglementation française comprennent notamment :","a":{"A":"Chien, chat, furet","B":"Chien, cochon, mouton","C":"Chien, lapin, cheval","D":"Chat, poule, chèvre"},"ok":"A","expl":"La réglementation française reconnaît comme carnivores domestiques le chien, le chat et le furet."},{"cat":"Réglementation","q":"L'identification légale des carnivores domestiques en France peut se faire par :","a":{"A":"Photographie","B":"Puce ou tatouage","C":"Prise de sang","D":"Collier nominatif uniquement"},"ok":"B","expl":"L'identification obligatoire s'effectue par puce électronique ou tatouage."},{"cat":"Réglementation","q":"Si le maire estime qu’un chien présente un danger, il peut notamment exiger :","a":{"A":"Une évaluation comportementale","B":"Un changement d’aliment","C":"Un toilettage réglementaire","D":"Une saillie contrôlée"},"ok":"A","expl":"Détaille la mise en demeure d’évaluation comportementale."},{"cat":"Réglementation","q":"Pour un chien de 1re catégorie, le dossier de permis inclut notamment :","a":{"A":"Certificat de naissance uniquement","B":"Assurance responsabilité civile et vaccination antirabique en cours de validité","C":"Aucune pièce vétérinaire","D":"Un jugement du tribunal"},"ok":"B","expl":"Le dossier comporte plusieurs justificatifs, dont assurance et vaccin antirabique."},{"cat":"Réglementation","q":"Pour un chien de 1re catégorie, la stérilisation est :","a":{"A":"Uniquement demandée pour les femelles","B":"Interdite","C":"Obligatoire","D":"Facultative"},"ok":"C","expl":"La stérilisation fait partie des obligations pour la 1re catégorie."},{"cat":"Réglementation","q":"En cas de contrôle, l’absence de présentation du permis de détention expose notamment à :","a":{"A":"Une amende","B":"Une suspension automatique de l’ACACED","C":"Une simple remarque orale","D":"Aucune conséquence"},"ok":"A","expl":"Le service public précise l’existence d’une amende en cas de non-présentation."},{"cat":"Reproduction","q":"Chez la chatte, l’ovulation est le plus souvent :","a":{"A":"Spontanée","B":"Absente en intérieur","C":"Unique dans la vie","D":"Induite par la saillie/stimulation"},"ok":"D","expl":"La chatte est classiquement une ovulatrice induite."},{"cat":"Reproduction","q":"À partir de quel jour de gestation la radiographie permet-elle de compter les fœtus chez la chienne ?","a":{"A":"J50","B":"J63","C":"J40","D":"J30"},"ok":"A","expl":"La radiographie permet de compter les fœtus après le 50e jour de gestation, une fois les squelettes calcifiés."},{"cat":"Reproduction","q":"À partir de la 5e semaine de gestation, les besoins énergétiques de la chienne augmentent d'environ :","a":{"A":"10 % par semaine","B":"50 % par semaine","C":"25 % par semaine","D":"2 % par semaine"},"ok":"A","expl":"À partir de la 5e semaine, les besoins énergétiques de la chienne augmentent d'environ 10 % par semaine."},{"cat":"Reproduction","q":"À quel moment est-il recommandé de commencer la transition vers un aliment plus énergétique chez la chienne gestante ?","a":{"A":"La veille de la mise-bas","B":"Après la mise-bas","C":"La 2e semaine","D":"La 5e semaine"},"ok":"D","expl":"La transition vers un aliment plus énergétique est recommandée vers la 5e semaine de gestation."},{"cat":"Reproduction","q":"Pendant la gestation, il est déconseillé de pratiquer :","a":{"A":"L’aliment de croissance/énergétique en fin de gestation","B":"Le suivi du poids","C":"La distribution à volonté","D":"Le rationnement contrôlé"},"ok":"C","expl":"La distribution ad libitum (à volonté) peut favoriser le surpoids et des difficultés lors de la mise bas."},{"cat":"Reproduction","q":"Pendant la gestation de la chienne, le suivi le plus important à réaliser régulièrement est :","a":{"A":"Réduire l’eau","B":"Peser la chienne chaque semaine","C":"Supprimer l’exercice","D":"Isoler totalement la chienne"},"ok":"B","expl":"Le suivi hebdomadaire du poids permet d'ajuster le rationnement et de détecter une prise de poids excessive."},{"cat":"Reproduction","q":"L’entrée en maternité de la chienne est conseillée :","a":{"A":"Au moment de l’expulsion du premier chiot","B":"Le jour de la saillie","C":"1 à 2 semaines avant la mise-bas prévue","D":"Après la mise-bas"},"ok":"C","expl":"Le guide conseille une entrée en maternité une à deux semaines avant la date prévue."},{"cat":"Reproduction","q":"Une chienne présentant des efforts expulsifs intenses depuis plus de 30 minutes sans expulsion doit faire suspecter :","a":{"A":"Une récupération normale","B":"Un simple stress de séparation","C":"Une dystocie","D":"Une pseudogestation"},"ok":"C","expl":"Efforts prolongés sans progression = suspicion de mise-bas dystocique."},{"cat":"Reproduction","q":"Une chienne fébrile après la mise-bas avec écoulement malodorant évoque en priorité :","a":{"A":"Une lactation normale","B":"Une complication infectieuse post-partum","C":"Une mue saisonnière","D":"Un changement comportemental normal"},"ok":"B","expl":"Fièvre et écoulement malodorant doivent faire suspecter une métrite/complication."},{"cat":"Reproduction","q":"Dans les premières heures de vie d'un chiot, l'ordre de priorité des gestes est :","a":{"A":"Vacciner, vermifuger, identifier","B":"Brosser, éduquer, sevrer","C":"Jouer, promener, laver","D":"Réchauffer, réhydrater, nourrir"},"ok":"D","expl":"Les premiers gestes prioritaires sont : réchauffer l'animal, le réhydrater, puis assurer son alimentation."},{"cat":"Reproduction","q":"Le colostrum est particulièrement important car il apporte surtout :","a":{"A":"Des anticorps maternels","B":"Des hormones sexuelles","C":"Des fibres","D":"Du calcium uniquement"},"ok":"A","expl":"Le colostrum participe à l’immunité passive du nouveau-né."},{"cat":"Reproduction","q":"Chez le chiot, le sevrage doit être abordé comme :","a":{"A":"Une période où l’eau doit être supprimée","B":"Un événement unique sur 24 h","C":"Une étape inutile","D":"Un processus progressif avec aspects physiologiques et pratiques"},"ok":"D","expl":"Le sevrage est un processus progressif permettant une transition en douceur vers l'alimentation solide."},{"cat":"Reproduction","q":"En début de gestation, une baisse transitoire d’appétit chez la chienne peut être :","a":{"A":"Toujours liée à une occlusion","B":"Toujours un signe de péritonite","C":"Parfois observée sans être forcément anormale","D":"Une preuve certaine d’infertilité"},"ok":"C","expl":"Qu’une baisse transitoire d’appétit peut être observée."},{"cat":"Reproduction","q":"Évaluer la qualité de la semence de l’étalon sert principalement à :","a":{"A":"Calculer le prix de vente","B":"Déterminer l’âge des chiots","C":"Choisir la couleur des chiots","D":"Apprécier le potentiel fécondant du mâle"},"ok":"D","expl":"L’évaluation de semence aide à apprécier la fertilité et à guider la reproduction."},{"cat":"Reproduction","q":"L'insémination artificielle chez la chienne est envisagée principalement :","a":{"A":"Comme méthode de socialisation","B":"Comme remplacement obligatoire de l’accouplement naturel","C":"Seulement chez les chats","D":"En cas d’accouplement difficile ou contexte adapté"},"ok":"D","expl":"L'insémination artificielle est surtout utilisée lorsque l'accouplement naturel est difficile ou impossible."},{"cat":"Chiot/Nouveau-né","q":"Chez le chiot nouveau-né, l’association hypothermie + hypoglycémie + déshydratation est :","a":{"A":"Classique et potentiellement grave","B":"Sans gravité","C":"Un signe de puberté précoce","D":"Toujours liée à la rage"},"ok":"A","expl":"Le guide traite ces troubles comme des urgences néonatales majeures."},{"cat":"Chiot/Nouveau-né","q":"Un chiot froid et peu réactif doit être réchauffé :","a":{"A":"Après le repas","B":"Uniquement au soleil direct","C":"Progressivement","D":"Brutalement avec eau glacée"},"ok":"C","expl":"Le réchauffement doit être progressif pour éviter d’aggraver l’état du chiot."},{"cat":"Chiot/Nouveau-né","q":"Le remplacement du colostrum est à envisager quand :","a":{"A":"Le nouveau-né n’a pas accès à un colostrum maternel de qualité","B":"Le chiot a reçu un colostrum de qualité","C":"Le chiot a déjà 6 mois","D":"La mère nourrit normalement"},"ok":"A","expl":"Le guide traite des solutions de remplacement en cas d’absence/insuffisance de colostrum."},{"cat":"Chiot/Nouveau-né","q":"Le lait de remplacement doit être :","a":{"A":"Celui de vache non modifié","B":"Un lait maternisé adapté aux carnivores domestiques","C":"Uniquement de l’eau sucrée","D":"Du lait entier froid"},"ok":"B","expl":"Le guide distingue le lait maternisé adapté du lait impropre."},{"cat":"Chiot/Nouveau-né","q":"Le sevrage bien conduit suppose surtout :","a":{"A":"Un arrêt brutal de l’allaitement en 24 h","B":"Une transition progressive avec aliment adapté","C":"L’isolement complet du chiot","D":"La suppression totale de l’eau"},"ok":"B","expl":"La progressivité limite les troubles digestifs et comportementaux."},{"cat":"Chiot/Nouveau-né","q":"La période de socialisation du chien est présentée par les éthologues comme :","a":{"A":"Sans impact futur","B":"Réservée aux chiens de chasse","C":"Strictement post-pubertaire","D":"Une période clé du futur comportement"},"ok":"D","expl":"La période de socialisation est une fenêtre critique qui influence fortement les réponses comportementales futures du chien."},{"cat":"Chiot/Nouveau-né","q":"La période néonatale se caractérise notamment par :","a":{"A":"La puberté","B":"Une agressivité territoriale maximale","C":"Une grande immaturité et dépendance","D":"Une totale autonomie sensorielle"},"ok":"C","expl":"La période néonatale correspond à un très haut niveau de dépendance."},{"cat":"Chiot/Nouveau-né","q":"Pour un bon apprentissage éducatif du chiot, la logique la plus efficace est :","a":{"A":"Cohérence, progression, associations positives","B":"Punition physique pour aller vite","C":"Isolement permanent","D":"Absence totale de règles"},"ok":"A","expl":"Un bon démarrage éducatif repose sur la cohérence, la patience et l'évitement des erreurs d'apprentissage précoces."},{"cat":"Chiot/Nouveau-né","q":"Le choix d’un collier, d’un harnais et d’une laisse pour chiot doit d’abord viser :","a":{"A":"L’esthétique","B":"L’adaptation à la taille et au confort du chiot","C":"La contrainte maximale","D":"Le prix le plus élevé"},"ok":"B","expl":"Le guide traite du choix adapté du matériel en fonction du chiot."},{"cat":"Chiot/Nouveau-né","q":"Favoriser le développement comportemental dans la nouvelle maison suppose surtout :","a":{"A":"Éviter toute nouveauté","B":"Supprimer les contacts sociaux","C":"Punir la peur","D":"Multiplier les expériences positives et graduées"},"ok":"D","expl":"Le guide insiste sur l’évitement des erreurs d’apprentissage et la qualité des expériences."},{"cat":"Comportement","q":"Le renforcement positif consiste à :","a":{"A":"Punir physiquement","B":"Retirer de l’eau","C":"Ignorer systématiquement","D":"Ajouter une conséquence agréable après le comportement souhaité"},"ok":"D","expl":"Le renforcement positif augmente la probabilité du comportement."},{"cat":"Comportement","q":"La désensibilisation efficace repose sur :","a":{"A":"Une exposition forte d’un seul coup","B":"L’absence de récompense","C":"Des expositions progressives sous le seuil de réaction","D":"La privation de nourriture"},"ok":"C","expl":"On progresse par paliers sous le seuil."},{"cat":"Comportement","q":"Le contre-conditionnement vise à :","a":{"A":"Augmenter la peur pour habituer l’animal","B":"Supprimer toutes les émotions","C":"Punir le chien au bon moment","D":"Associer un stimulus problématique à quelque chose de positif"},"ok":"D","expl":"On cherche à modifier l’émotion associée au stimulus."},{"cat":"Comportement","q":"Punir un grognement est risqué parce que cela peut :","a":{"A":"Rendre le chien plus prévisible","B":"Supprimer l’avertissement sans supprimer l’inconfort","C":"Calmer toujours le chien","D":"Renforcer le signal d’alerte"},"ok":"B","expl":"Le grognement est un signal utile ; la cause doit être traitée."},{"cat":"Comportement","q":"Chez le chien, un corps figé avec regard fixe évoque surtout :","a":{"A":"Une digestion normale","B":"Du sommeil","C":"De la tension/alerte","D":"Du jeu détendu"},"ok":"C","expl":"La posture figée et le regard fixe sont des signaux de tension."},{"cat":"Comportement","q":"Chez le chien, détourner la tête pendant une interaction sert souvent à :","a":{"A":"Réclamer de l’eau","B":"Signaler une douleur rénale","C":"Apaiser/éviter le conflit","D":"Menacer"},"ok":"C","expl":"C’est un signal d’apaisement ou d’évitement fréquent."},{"cat":"Comportement","q":"Chez le chien, des bâillements répétés hors fatigue peuvent traduire :","a":{"A":"Un signal d’apaisement ou de stress","B":"Une absence totale d’émotion","C":"Une crise de rage","D":"Une occlusion"},"ok":"A","expl":"Le bâillement fait partie des signaux d’apaisement possibles."},{"cat":"Comportement","q":"Face à une protection de gamelle, l’approche la plus professionnelle est :","a":{"A":"Laisser les enfants tester le chien","B":"Punir à chaque grognement","C":"Retirer la gamelle de force","D":"Mettre en place gestion et protocole de désensibilisation/contre-conditionnement"},"ok":"D","expl":"La confrontation augmente le risque ; on travaille de façon sécurisée."},{"cat":"Comportement","q":"Un chien qui détruit surtout en absence et vocalise évoque en priorité :","a":{"A":"Une possible anxiété liée à la séparation","B":"Une rage certaine","C":"Une fracture du bassin","D":"Une dermatose"},"ok":"A","expl":"Le contexte d’apparition oriente vers un trouble lié à l’absence."},{"cat":"Comportement","q":"En pension, le levier le plus solide pour réduire les conflits est :","a":{"A":"Évaluer les compatibilités, gérer les ressources et introduire progressivement","B":"Mélanger tous les chiens rapidement","C":"Supprimer les promenades","D":"Changer d’aliment chaque jour"},"ok":"A","expl":"Compatibilités, espace, rythme et ressources sont centraux."},{"cat":"Comportement","q":"Le marquage urinaire chez le chat doit faire évoquer d’abord :","a":{"A":"Une obéissance insuffisante","B":"Un problème territorial/stress et/ou une cause médicale à exclure","C":"Une vengeance","D":"Un simple caprice"},"ok":"B","expl":"Toujours exclure d’abord un problème médical avant la lecture comportementale."},{"cat":"Comportement","q":"Chez le chat, les hauteurs et cachettes ont surtout pour intérêt de :","a":{"A":"Augmenter la prise alimentaire","B":"Remplacer les litières","C":"Empêcher toute sieste","D":"Accroître le sentiment de contrôle et réduire le stress"},"ok":"D","expl":"Les zones en hauteur/caches sont des ressources majeures."},{"cat":"Comportement","q":"Un clignement lent des yeux chez le chat est le plus souvent associé à :","a":{"A":"Apaisement/confiance","B":"Menace immédiate","C":"Douleur osseuse","D":"Agressivité offensive"},"ok":"A","expl":"Le clignement lent est classiquement un signal affiliatif/apaisé."},{"cat":"Comportement","q":"Une queue qui fouette chez le chat traduit le plus souvent :","a":{"A":"Une détente profonde","B":"Une soif majeure","C":"Une anémie","D":"Une irritation/excitation"},"ok":"D","expl":"La queue battante est souvent associée à l’agacement ou l’excitation."},{"cat":"Comportement","q":"Lors d’un soin inconfortable, si le chien détourne la tête, se fige et lèche sa truffe, la meilleure conduite est :","a":{"A":"Punir pour éviter l’habitude","B":"Abandonner définitivement tous les soins","C":"Forcer pour terminer vite","D":"Diminuer l’intensité, faire des pauses, reprendre sous le seuil"},"ok":"D","expl":"Ces signaux indiquent un inconfort : il faut adapter la manipulation."},{"cat":"Comportement","q":"Avec un enfant et un chien, la mesure la plus sûre reste :","a":{"A":"Forcer le contact pour socialiser","B":"Laisser interagir seuls pour apprendre","C":"Supervision active + lecture des signaux + respect des temps de repos","D":"Punir le chien s’il s’éloigne"},"ok":"C","expl":"La supervision est la base de la prévention des accidents."},{"cat":"Comportement","q":"Le facteur le plus important pour qu’une récompense soit efficace est :","a":{"A":"Le timing proche du comportement","B":"Le bruit ambiant","C":"Sa couleur","D":"Sa taille uniquement"},"ok":"A","expl":"Un bon timing améliore fortement l’apprentissage."},{"cat":"Comportement","q":"En apprentissage, l’extinction correspond à :","a":{"A":"Une punition physique","B":"L’augmentation d’un comportement par récompense","C":"La diminution progressive d’un comportement qui n’est plus renforcé","D":"Une maladie comportementale"},"ok":"C","expl":"Sans renforcement, certains comportements diminuent progressivement."},{"cat":"Comportement","q":"La punition négative correspond à :","a":{"A":"Donner une friandise","B":"Ajouter un stimulus aversif","C":"Retirer quelque chose d’agréable pour réduire un comportement","D":"Changer de collier"},"ok":"C","expl":"Exemple : retirer l’accès à une interaction quand le chien saute."},{"cat":"Comportement","q":"Le renforcement négatif correspond à :","a":{"A":"Punir physiquement","B":"Retirer un stimulus désagréable quand le bon comportement apparaît","C":"Ignorer l’animal","D":"Ajouter une récompense"},"ok":"B","expl":"Il augmente le comportement par suppression d’un stimulus aversif."},{"cat":"Santé","q":"En structure, la désinfection est d’autant plus efficace qu’elle est précédée par :","a":{"A":"Un parfum d’ambiance","B":"Un nettoyage correct","C":"Un séchage au soleil uniquement","D":"Un changement d’aliment"},"ok":"B","expl":"Les matières organiques diminuent l’efficacité de nombreux désinfectants."},{"cat":"Santé","q":"Pour réduire la contamination croisée entre boxes, la mesure la plus importante est :","a":{"A":"Augmenter la densité","B":"Hygiène des mains et matériel dédié ou désinfecté entre animaux","C":"Partager les litières","D":"Utiliser le même matériel partout"},"ok":"B","expl":"Les mains et le matériel sont des vecteurs majeurs de transmission."},{"cat":"Santé","q":"Une quarantaine d’admission en structure sert principalement à :","a":{"A":"Retarder la socialisation à vie","B":"Détecter précocement maladies/parasites et protéger le collectif","C":"Punir les nouveaux arrivants","D":"Supprimer les vaccins"},"ok":"B","expl":"La quarantaine est un outil de prévention sanitaire."},{"cat":"Santé","q":"La zone d’isolement en structure doit accueillir en priorité :","a":{"A":"Les animaux suspects de contagion","B":"Les chiens les plus chers","C":"Les chats âgés uniquement","D":"Les animaux les plus joueurs"},"ok":"A","expl":"L’isolement limite la diffusion d’agents infectieux."},{"cat":"Santé","q":"Une respiration difficile chez un chien ou un chat doit être considérée comme :","a":{"A":"Un signe bénin","B":"Un comportement normal en caisse","C":"Une urgence potentielle","D":"Une preuve de dominance"},"ok":"C","expl":"Toute détresse respiratoire est une urgence."},{"cat":"Santé","q":"Un abdomen très distendu avec tentatives de vomissement improductives chez un chien doit faire suspecter :","a":{"A":"Une dermatite","B":"Une cataracte","C":"Une teigne","D":"Une dilatation-torsion d’estomac"},"ok":"D","expl":"La DTE est une urgence vitale."},{"cat":"Santé","q":"Face à une hémorragie externe abondante, la première mesure utile est :","a":{"A":"Compression directe avec tissu propre","B":"Laisser saigner","C":"Bain froid","D":"Donner du lait"},"ok":"A","expl":"La compression directe limite le saignement en attendant les soins."},{"cat":"Santé","q":"En cas de convulsions, il faut surtout éviter de :","a":{"A":"Observer la durée","B":"Appeler un vétérinaire","C":"Sécuriser l’espace","D":"Mettre les doigts dans la bouche"},"ok":"D","expl":"Mettre les doigts dans la bouche expose à des morsures et ne sert pas l’animal."},{"cat":"Santé","q":"À l’admission d’un animal en structure, le contrôle le plus pertinent inclut :","a":{"A":"Couleur des jouets","B":"État général, signes de maladie, parasitisme, documents requis","C":"Préférence de coussin","D":"Âge des propriétaires"},"ok":"B","expl":"Le triage d’admission doit viser le risque sanitaire et l’état général."},{"cat":"Santé","q":"Un vermifuge est destiné à lutter principalement contre :","a":{"A":"Les bactéries","B":"Les virus","C":"Les vers internes","D":"Les levures cutanées"},"ok":"C","expl":"Le vermifuge cible surtout les parasites internes."},{"cat":"Santé","q":"Pourquoi la puce favorise-t-elle aussi certains troubles digestifs parasitaires ?","a":{"A":"Elle transmet la rage","B":"Elle dissout les os","C":"Elle bloque la lactation","D":"Elle peut être hôte intermédiaire du Dipylidium"},"ok":"D","expl":"L’ingestion de puces porteuses peut transmettre Dipylidium."},{"cat":"Santé","q":"La leptospirose est principalement une maladie :","a":{"A":"Bactérienne","B":"Virale","C":"Fongique","D":"Tumorale"},"ok":"A","expl":"La leptospirose est une maladie bactérienne."},{"cat":"Santé","q":"La voie de contamination typique de la leptospirose est surtout :","a":{"A":"Les griffades du chat","B":"Le clignement des yeux","C":"Le lait maternel uniquement","D":"L’urine contaminée et les eaux souillées"},"ok":"D","expl":"Leptospires : contamination par urine/eaux souillées."},{"cat":"Santé","q":"La parvovirose canine est principalement une maladie :","a":{"A":"Virale","B":"Bactérienne","C":"Mycose","D":"Parasitose interne"},"ok":"A","expl":"La parvovirose est une maladie virale hautement contagieuse."},{"cat":"Santé","q":"La parvovirose se transmet classiquement par :","a":{"A":"Voie oro-fécale","B":"Lait uniquement","C":"Morsure uniquement","D":"Voie sexuelle uniquement"},"ok":"A","expl":"La matière fécale et l’environnement jouent un rôle majeur."},{"cat":"Santé","q":"Le typhus du chat (panleucopénie) est principalement :","a":{"A":"Une maladie virale","B":"Une mycose","C":"Une intoxication","D":"Une maladie uniquement hormonale"},"ok":"A","expl":"Le typhus félin correspond à une panleucopénie virale."},{"cat":"Santé","q":"Si plusieurs chiens d’une pension se mettent à tousser, la mesure de gestion immédiate la plus solide est :","a":{"A":"Cohorter/isolations et renforcer l’hygiène en attendant l’avis vétérinaire","B":"Donner des restes de table","C":"Faire des groupes plus grands","D":"Supprimer l’eau"},"ok":"A","expl":"Face à une suspicion contagieuse, il faut limiter les contacts et renforcer l’hygiène."},{"cat":"Santé","q":"La teigne est particulièrement problématique en collectivité car :","a":{"A":"Elle se transmet seulement par l’eau","B":"Elle est toujours spontanément bénigne","C":"Les spores persistent dans l’environnement","D":"Elle ne touche jamais l’homme"},"ok":"C","expl":"La persistance environnementale explique la difficulté de gestion."},{"cat":"Santé","q":"Des muqueuses sèches et un pli de peau persistant orientent surtout vers :","a":{"A":"Une déshydratation","B":"Une gestation","C":"Une crise épileptique","D":"Une rage"},"ok":"A","expl":"Ce sont des signes compatibles avec une déshydratation."},{"cat":"Santé","q":"Un animal qui mange moins, s’isole et change de posture doit faire suspecter :","a":{"A":"Toujours de la dominance","B":"Douleur ou maladie à explorer","C":"Une amélioration de santé","D":"Un comportement normal obligatoire"},"ok":"B","expl":"Douleur et maladie modifient souvent posture et interactions."},{"cat":"Santé","q":"En cas d’ingestion suspecte de toxique, il faut éviter de :","a":{"A":"Contacter le vétérinaire","B":"Donner un historique précis du produit","C":"Faire vomir systématiquement sans avis","D":"Surveiller les signes"},"ok":"C","expl":"Certains toxiques/objets rendent l’induction du vomissement dangereuse."},{"cat":"Alimentation","q":"Le chat est qualifié de carnivore strict notamment en raison de son besoin incontournable en :","a":{"A":"Amidon","B":"Lactose","C":"Fibres longues","D":"Taurine"},"ok":"D","expl":"La taurine doit être apportée par l’alimentation du chat."},{"cat":"Alimentation","q":"Une transition alimentaire réussie doit être plutôt :","a":{"A":"Basée sur le jeûne","B":"Progressive sur plusieurs jours","C":"Faite uniquement le soir","D":"Brutale sur 24 heures"},"ok":"B","expl":"La transition progressive limite les troubles digestifs."},{"cat":"Alimentation","q":"Le suivi le plus pertinent du surpoids associe :","a":{"A":"Couleur de robe et âge","B":"Nombre de jouets","C":"Poids et score corporel (BCS)","D":"Taille des oreilles"},"ok":"C","expl":"Poids + BCS sont les meilleurs outils simples de suivi."},{"cat":"Alimentation","q":"Chez le chiot, l’aliment de croissance doit surtout apporter :","a":{"A":"Moins d’énergie qu’un adulte","B":"Uniquement des légumes","C":"Des apports adaptés à la croissance osseuse et musculaire","D":"Uniquement des glucides"},"ok":"C","expl":"La croissance nécessite une ration équilibrée et adaptée au stade de vie."},{"cat":"Alimentation","q":"L'aliment énergétique introduit en fin de gestation peut idéalement aussi servir :","a":{"A":"Teindre le pelage","B":"Éviter la lactation","C":"Sevrer les chiots","D":"Supprimer l’eau"},"ok":"C","expl":"Idéalement, l'aliment énergétique introduit en fin de gestation est maintenu pendant la phase de sevrage."},{"cat":"Alimentation","q":"Dans un régime BARF, un excès de viande sans os expose principalement à :","a":{"A":"Une baisse de température","B":"Une vaccination insuffisante","C":"Une meilleure minéralisation","D":"Un régime déséquilibré"},"ok":"D","expl":"Un excès de viande sans os dans un régime BARF entraîne un déséquilibre en phosphore et un déficit en calcium."},{"cat":"Alimentation","q":"Dans un régime BARF, un excès de légumes expose principalement à :","a":{"A":"Une cataracte","B":"Une teigne","C":"Un régime déséquilibré","D":"Une rage"},"ok":"C","expl":"Trop de légumes dans une ration BARF peut provoquer des ballonnements et des troubles digestifs."},{"cat":"Alimentation","q":"Dans un régime BARF, les os cuits sont à éviter car ils peuvent :","a":{"A":"Protéger les dents","B":"Faire obstruction","C":"Apporter trop de taurine","D":"Hydrater l’animal"},"ok":"B","expl":"Les os cuits deviennent cassants et peuvent se fragmenter en éclats, risquant d'obstruer ou de perforer le tube digestif."},{"cat":"Alimentation","q":"Dans un régime BARF, des morceaux d'os trop petits représentent un risque car ils peuvent :","a":{"A":"Remplacer le calcium","B":"Améliorer la digestion","C":"Être avalés tels quels et obstruer","D":"Éviter les vomissements"},"ok":"C","expl":"Des os trop petits ou des fragments peuvent être avalés entiers et provoquer une obstruction digestive."},{"cat":"Alimentation","q":"Dans l'alimentation du chien et du chat, l'oignon et l'ail sont classés comme :","a":{"A":"Utiles en gestation","B":"Bons stimulants immunitaires","C":"Riches en calcium","D":"Toxiques pour les carnivores domestiques, pouvant provoquer une anémie"},"ok":"D","expl":"L'oignon et l'ail sont toxiques pour le chien et le chat : ils détruisent les globules rouges et provoquent une anémie hémolytique."},{"cat":"Alimentation","q":"Le chocolat dans l'alimentation du chien est :","a":{"A":"Toxique pour le chien","B":"Un vermifuge naturel","C":"Sans danger si noir","D":"Recommandé après effort"},"ok":"A","expl":"Le chocolat est toxique pour le chien à cause de la théobromine, pouvant provoquer des troubles cardiaques et nerveux."},{"cat":"Alimentation","q":"Le lait de vache chez le chien est souvent associé à :","a":{"A":"Un apport idéal pour adultes","B":"Une prévention de l’obésité","C":"Une meilleure dentition","D":"De la diarrhée et une prise de poids"},"ok":"D","expl":"Le lait de vache peut provoquer chez le chien des diarrhées (intolérance au lactose), un surpoids et des dépôts sur les dents."},{"cat":"Alimentation","q":"Les noyaux de fruits et les épis de maïs représentent un risque car ils peuvent :","a":{"A":"Stimuler le transit","B":"Remplacer les fibres","C":"Prévenir les vomissements","D":"Provoquer une obstruction digestive"},"ok":"D","expl":"Les noyaux de fruits et épis de maïs sont des corps étrangers pouvant obstruer le tube digestif."},{"cat":"Alimentation","q":"Une consommation prolongée et excessive de certains poissons crus (carpe, hareng) peut favoriser :","a":{"A":"Une cataracte","B":"Une rage","C":"Une hyperthyroïdie","D":"Une carence en vitamine B1"},"ok":"D","expl":"Certains poissons crus contiennent une enzyme (la thiaminase) qui détruit la vitamine B1, pouvant entraîner des carences."},{"cat":"Alimentation","q":"Un excès de foie dans la ration du chien peut conduire à :","a":{"A":"Un excès de vitamine A","B":"Une baisse de fertilité certaine","C":"Une hypoglycémie","D":"Un déficit en calcium"},"ok":"A","expl":"Le foie est très riche en vitamine A ; consommé en excès, il peut provoquer une hypervitaminose A toxique."},{"cat":"Alimentation","q":"Les lys sont particulièrement dangereux surtout chez :","a":{"A":"Le chien","B":"Le chat","C":"Aucun des deux","D":"Le lapin"},"ok":"B","expl":"Chez le chat, certaines espèces de lys peuvent provoquer une insuffisance rénale aiguë."},{"cat":"Alimentation","q":"Le xylitol est surtout dangereux chez :","a":{"A":"Le furet","B":"Le chien","C":"Aucun","D":"Le chat"},"ok":"B","expl":"Le xylitol peut provoquer une hypoglycémie sévère chez le chien."},{"cat":"Alimentation","q":"Chez le chat, favoriser plusieurs points d’eau et parfois une fontaine sert surtout à :","a":{"A":"Favoriser l’hydratation","B":"Remplacer l’aliment","C":"Supprimer les besoins urinaires","D":"Réduire la prise d’eau"},"ok":"A","expl":"De nombreux chats boivent peu : le support environnemental compte."},{"cat":"Alimentation","q":"Une ration ménagère professionnelle doit être :","a":{"A":"Improvisée","B":"Équilibrée et formulée avec suivi adapté","C":"Uniquement carnée","D":"Sans minéraux"},"ok":"B","expl":"Une ration ménagère doit être formulée pour éviter carences et excès."},{"cat":"Alimentation","q":"Les restes de table posent surtout problème quand ils sont :","a":{"A":"Adaptés, limités et rationnés","B":"Donnés le matin","C":"Trop gras, salés ou déséquilibrés","D":"Servis tièdes"},"ok":"C","expl":"Le problème majeur est le déséquilibre et l’excès."},{"cat":"Bien-être / Caudotomie","q":"Les données scientifiques sur la douleur liée à la caudotomie (amputation de la queue) vont globalement dans le sens :","a":{"A":"D’une simple gêne esthétique","B":"D’une absence de douleur lors de l’opération","C":"D’une douleur aiguë lors de l’opération","D":"D’un bénéfice neurologique"},"ok":"C","expl":"Les études disponibles indiquent que la caudotomie est une procédure douloureuse, même chez les nouveau-nés."},{"cat":"Bien-être / Caudotomie","q":"L’absence d’étude montrant l’absence de douleur chez le chiot signifie surtout que :","a":{"A":"On ne peut pas utiliser cela pour conclure à l’innocuité","B":"Les chiots ne sentent jamais rien","C":"La douleur est impossible","D":"La pratique est forcément bénéfique"},"ok":"A","expl":"Souligne qu’aucune étude ne fournit d’arguments en faveur de l’absence de douleur."},{"cat":"Bien-être / Caudotomie","q":"Parmi les complications potentiellement douloureuses à long terme de la caudotomie, on cite :","a":{"A":"La gingivite","B":"La cataracte","C":"Le névrôme","D":"L’hypothyroïdie"},"ok":"C","expl":"Les névromes (petites tumeurs bénignes sur le nerf sectionné) sont une complication douloureuse reconnue de la caudotomie."},{"cat":"Bien-être / Caudotomie","q":"La caudotomie pourrait également favoriser :","a":{"A":"Une meilleure locomotion dans tous les cas","B":"Des problèmes d’incontinence fécale ou urinaire","C":"Une immunité plus forte","D":"Une meilleure socialisation"},"ok":"B","expl":"Certaines études évoquent un risque accru d'incontinence fécale ou urinaire suite à la caudotomie."},{"cat":"Bien-être / Caudotomie","q":"Après une caudotomie, il est jugé souhaitable de :","a":{"A":"L’administration d’une analgésie post-opératoire","B":"Le retour immédiat à l’exercice","C":"L’absence totale d’analgésie","D":"La suppression de toute surveillance"},"ok":"A","expl":"L'analgésie post-opératoire (gestion de la douleur) est considérée comme indispensable après une caudotomie."},{"cat":"Bien-être / Caudotomie","q":"La caudotomie est également étudiée sous l'angle de :","a":{"A":"Du développement des dents de lait","B":"De la stérilisation des chats","C":"De la communication visuelle du chien","D":"De la vaccination féline"},"ok":"C","expl":"La queue joue un rôle dans la communication visuelle du chien ; son amputation peut donc affecter les échanges avec ses congénères."},{"cat":"Bien-être / Caudotomie","q":"La queue du chien joue aussi un rôle dans :","a":{"A":"Le sevrage du chaton","B":"La radiographie gestationnelle","C":"Le dosage du colostrum","D":"L’équilibre aux allures"},"ok":"D","expl":"La queue contribue à l'équilibre du chien lors des déplacements, notamment à allure rapide."},{"cat":"Bien-être / Caudotomie","q":"Les études sur les effets à long terme de la caudotomie sont difficiles à interpréter principalement car :","a":{"A":"Le facteur race et le facteur caudotomie sont difficiles à distinguer","B":"La douleur est imaginaire","C":"La chirurgie est toujours identique","D":"Les chiens n’ont pas de queue"},"ok":"A","expl":"Les résultats sont biaisés par les prédispositions génétiques propres à chaque race, rendant les comparaisons complexes."},{"cat":"Bien-être / Caudotomie","q":"L’idée qu’un chiot retourne vite téter après l’opération prouve que la douleur est absente :","a":{"A":"Non, ce raisonnement est jugé dangereux","B":"Oui, si la mère le lèche","C":"Seulement chez les grandes races","D":"Oui, toujours"},"ok":"A","expl":"Critique explicitement cette extrapolation."},{"cat":"Bien-être / Caudotomie","q":"La caudotomie est soumise à évaluation notamment par rapport à :","a":{"A":"Les objectifs zootechniques visés par la pratique","B":"Le dressage militaire","C":"La seule valeur commerciale des chiots","D":"Les performances en agility uniquement"},"ok":"A","expl":"Les objectifs souvent invoqués pour justifier la caudotomie (esthétique, prévention des accidents) sont remis en question par les études scientifiques."},{"cat":"Pathologie","q":"Pour le traitement du mastocytome cutané chez le chien, l'approche de base est :","a":{"A":"Le brossage local","B":"Le simple shampoing","C":"La mise au repos","D":"La chirurgie d’exérèse large"},"ok":"D","expl":"La chirurgie avec des marges larges est le traitement de référence pour le mastocytome cutané."},{"cat":"Pathologie","q":"Des cellules tumorales d'un mastocytome peuvent être présentes jusqu'à quelle distance au-delà de la lésion visible ?","a":{"A":"0,5 cm de la lésion visible","B":"1 cm de la lésion visible","C":"3 cm de la lésion visible","D":"10 cm de la lésion visible"},"ok":"C","expl":"Des cellules tumorales peuvent s'étendre jusqu'à 3 cm au-delà de la limite macroscopiquement visible, d'où l'importance de marges larges."},{"cat":"Pathologie","q":"Si le nœud lymphatique de drainage est suspect lors d'un mastocytome, il est recommandé de :","a":{"A":"De masser la zone","B":"De ne rien faire","C":"De donner uniquement des vitamines","D":"De le retirer et l’analyser"},"ok":"D","expl":"Un nœud lymphatique suspect doit être prélevé chirurgicalement et envoyé en analyse histologique."},{"cat":"Pathologie","q":"Les mastocytomes de haut grade métastasent préférentiellement d’abord vers :","a":{"A":"Le cerveau uniquement","B":"Les nœuds lymphatiques drainant la tumeur primaire","C":"Les poumons","D":"La peau saine opposée"},"ok":"B","expl":"Cite d’abord les nœuds lymphatiques de drainage."},{"cat":"Pathologie","q":"Après diagnostic de mastocytome, un traitement spécifique digestif est souvent mis en place car la tumeur peut s’accompagner de :","a":{"A":"Otites chroniques uniquement","B":"Fractures","C":"Kératite","D":"Ulcérations gastriques et signes digestifs"},"ok":"D","expl":"Évoque vomissements, diarrhée et saignements digestifs."},{"cat":"Pathologie","q":"Le pronostic des mastocytomes de haut grade traités par chirurgie seule est :","a":{"A":"Réputé défavorable","B":"Toujours excellent","C":"Sans rapport avec le grade","D":"Toujours bénin"},"ok":"A","expl":"Insiste sur le mauvais pronostic des formes de haut grade sans traitement complémentaire."},{"cat":"Pathologie","q":"Le bilan d’extension d’un mastocytome sert principalement à :","a":{"A":"Apprécier l’agressivité et guider la stratégie thérapeutique","B":"Évaluer la dentition","C":"Choisir la couleur du pansement","D":"Déterminer le sexe du chien"},"ok":"A","expl":"Le bilan d’extension aide à la stadification et à la stratégie thérapeutique."},{"cat":"Bien-être","q":"En multi-chats, la règle pratique la plus reconnue pour les litières est :","a":{"A":"Une litière par étage uniquement","B":"Aucune litière si les chats sortent","C":"Une seule litière suffit toujours","D":"Nombre de litières = nombre de chats + 1"},"ok":"D","expl":"Multiplier les litières réduit les conflits d’accès et le stress."},{"cat":"Bien-être","q":"Pour diminuer les conflits entre chats, il faut surtout :","a":{"A":"Concentrer toutes les ressources au même endroit","B":"Multiplier et répartir les ressources","C":"Supprimer les hauteurs","D":"Punir les feulements"},"ok":"B","expl":"La répartition des ressources limite la compétition."},{"cat":"Bien-être","q":"Le bien-être animal inclut en priorité :","a":{"A":"Eau propre, alimentation adaptée, repos, sécurité et comportements propres à l’espèce","B":"Le confort humain avant tout","C":"Uniquement l’absence de maladie","D":"La contrainte pour obtenir l’obéissance"},"ok":"A","expl":"Le bien-être recouvre besoins physiologiques, sanitaires et comportementaux."},{"cat":"Bien-être","q":"Lors d’un transport en voiture, le mode le plus sûr est :","a":{"A":"Animal libre sur le siège","B":"Animal tenu par le collier","C":"Animal sécurisé par caisse ou harnais adapté","D":"Animal sur les genoux du conducteur"},"ok":"C","expl":"La sécurisation réduit le risque de blessure et de fuite."},{"cat":"Bien-être","q":"Une contention « low stress » vise avant tout à :","a":{"A":"Réduire la peur et sécuriser la manipulation","B":"Allonger le temps de soin","C":"Remplacer la formation du personnel","D":"Empêcher tout mouvement par douleur"},"ok":"A","expl":"La manipulation à faible stress améliore sécurité et bien-être."},{"cat":"Bien-être","q":"L’enrichissement olfactif du chien peut être apporté notamment par :","a":{"A":"Musique très forte","B":"Privation sensorielle","C":"Suppression des promenades","D":"Recherche alimentaire / jeux de flair"},"ok":"D","expl":"Le flair est un besoin majeur chez le chien."},{"cat":"Bien-être","q":"Chez le chat, le griffoir répond principalement à :","a":{"A":"Un besoin de lait","B":"Un besoin de marquage et d’entretien des griffes","C":"Une prévention vaccinale","D":"Une réduction de la température"},"ok":"B","expl":"Le griffoir a une fonction comportementale et mécanique."},{"cat":"Bien-être","q":"Dans une structure, un sas de sécurité sert principalement à :","a":{"A":"Réchauffer les aliments","B":"Limiter les fugues lors des entrées/sorties","C":"Augmenter les contacts entre animaux","D":"Stocker les médicaments"},"ok":"B","expl":"Le sas sécurise les flux et limite les évasions."},{"cat":"Bien-être","q":"Un couchage bien choisi pour un chien doit être avant tout :","a":{"A":"En plein courant d’air","B":"À côté de la litière du chat","C":"Calme, propre et adapté à sa taille","D":"Placée dans un lieu de passage très fréquent"},"ok":"C","expl":"Le repos doit se faire dans un environnement sécurisant."},{"cat":"Santé","q":"La voie de transmission la plus typique de coryza félin est :","a":{"A":"uniquement par lait maternel","B":"uniquement par morsure","C":"uniquement par l’eau potable","D":"sécrétions respiratoires / contact"},"ok":"D","expl":"Transmission typique : sécrétions respiratoires / contact."},{"cat":"Santé","q":"La mesure la plus structurante pour prévenir coryza félin en collectivité est :","a":{"A":"augmenter la densité","B":"isolement + hygiène renforcée","C":"supprimer les sorties","D":"diminuer l’eau"},"ok":"B","expl":"Prévention clé : isolement + hygiène renforcée."},{"cat":"Santé","q":"Coryza félin est principalement une maladie :","a":{"A":"virale","B":"fongique","C":"bactérienne","D":"parasitaire"},"ok":"A","expl":"Coryza félin est principalement virale."},{"cat":"Santé","q":"La voie de transmission la plus typique de parvovirose canine est :","a":{"A":"voie oro-fécale / environnement","B":"uniquement par l’eau potable","C":"uniquement par morsure","D":"uniquement par lait maternel"},"ok":"A","expl":"Transmission typique : voie oro-fécale / environnement."},{"cat":"Santé","q":"La mesure la plus structurante pour prévenir parvovirose canine en collectivité est :","a":{"A":"vaccination + désinfection","B":"diminuer l’eau","C":"supprimer les sorties","D":"augmenter la densité"},"ok":"A","expl":"Prévention clé : vaccination + désinfection."},{"cat":"Santé","q":"Parvovirose canine est principalement une maladie :","a":{"A":"parasitaire","B":"bactérienne","C":"fongique","D":"virale"},"ok":"D","expl":"Parvovirose canine est principalement virale."},{"cat":"Santé","q":"La voie de transmission la plus typique de typhus félin est :","a":{"A":"voie oro-fécale / environnement","B":"uniquement par lait maternel","C":"uniquement par l’eau potable","D":"uniquement par morsure"},"ok":"A","expl":"Transmission typique : voie oro-fécale / environnement."},{"cat":"Santé","q":"La mesure la plus structurante pour prévenir typhus félin en collectivité est :","a":{"A":"supprimer les sorties","B":"diminuer l’eau","C":"vaccination + désinfection","D":"augmenter la densité"},"ok":"C","expl":"Prévention clé : vaccination + désinfection."},{"cat":"Santé","q":"Typhus félin est principalement une maladie :","a":{"A":"virale","B":"fongique","C":"bactérienne","D":"parasitaire"},"ok":"A","expl":"Typhus félin est principalement virale."},{"cat":"Santé","q":"La voie de transmission la plus typique de teigne est :","a":{"A":"uniquement par l’eau potable","B":"uniquement par morsure","C":"uniquement par lait maternel","D":"spores / contact / environnement"},"ok":"D","expl":"Transmission typique : spores / contact / environnement."},{"cat":"Santé","q":"La mesure la plus structurante pour prévenir teigne en collectivité est :","a":{"A":"diminuer l’eau","B":"supprimer les sorties","C":"augmenter la densité","D":"isolement + traitement + nettoyage"},"ok":"D","expl":"Prévention clé : isolement + traitement + nettoyage."},{"cat":"Santé","q":"Teigne est principalement une maladie :","a":{"A":"fongique","B":"bactérienne","C":"virale","D":"parasitaire"},"ok":"A","expl":"Teigne est principalement fongique."},{"cat":"Comportement","q":"Un chien saute systématiquement sur les visiteurs à l’accueil. Le plan le plus professionnel est :","a":{"A":"Le laisser faire pour se fatiguer","B":"Mettre un coup de genou","C":"Crier plus fort","D":"Renforcer les 4 pattes au sol, gérer l’environnement et harmoniser les consignes"},"ok":"D","expl":"On renforce le comportement alternatif souhaité et on gère la situation."},{"cat":"Comportement","q":"Deux chats cohabitent mal et l’un bloque l’accès à la litière. La mesure la plus efficace est :","a":{"A":"Punir le chat bloqueur","B":"Ajouter des litières, voies de circulation et hauteurs","C":"Nourrir dans la litière","D":"Supprimer toutes les litières sauf une"},"ok":"B","expl":"Le réaménagement des ressources réduit la compétition."},{"cat":"Comportement","q":"Un chien présente un comportement de fuite lors du brossage. La réponse professionnelle est :","a":{"A":"Le maintenir de force","B":"Le gronder","C":"Fractionner, renforcer les approximations, travailler progressivement","D":"Abandonner tout brossage à vie"},"ok":"C","expl":"On applique une désensibilisation graduelle associée à du positif."},{"cat":"Comportement","q":"Un chat nouvellement adopté reste caché. L’approche adaptée est :","a":{"A":"Inviter beaucoup de monde pour l’habituer","B":"Supprimer les cachettes","C":"Lui laisser une pièce-refuge avec ressources, puis élargir progressivement","D":"Le sortir de force chaque heure"},"ok":"C","expl":"Le contrôle de l’environnement aide l’adaptation du chat."},{"cat":"Comportement","q":"Un chien grogne quand on approche sa gamelle. Le mauvais réflexe est :","a":{"A":"Retirer la gamelle de force","B":"Éviter de mettre les enfants en risque","C":"Prendre conseil si besoin","D":"Travailler avec un protocole sécurisé"},"ok":"A","expl":"Le retrait de force augmente le risque et la conflictualité."},{"cat":"Alimentation","q":"Pourquoi chocolat doit-il être considéré comme dangereux ?","a":{"A":"théobromine","B":"parce que cela hydrate trop","C":"parce que cela remplace le calcium","D":"parce que cela vaccine l’animal"},"ok":"A","expl":"Le danger principal est : théobromine."},{"cat":"Alimentation","q":"Pourquoi oignon et ail doit-il être considéré comme dangereux ?","a":{"A":"parce que cela hydrate trop","B":"parce que cela vaccine l’animal","C":"toxicité hémolytique / anémie","D":"parce que cela remplace le calcium"},"ok":"C","expl":"Le danger principal est : toxicité hémolytique / anémie."},{"cat":"Alimentation","q":"Pourquoi xylitol doit-il être considéré comme dangereux ?","a":{"A":"hypoglycémie sévère (surtout chez le chien)","B":"parce que cela hydrate trop","C":"parce que cela vaccine l’animal","D":"parce que cela remplace le calcium"},"ok":"A","expl":"Le danger principal est : hypoglycémie sévère (surtout chez le chien)."},{"cat":"Alimentation","q":"Pourquoi lys doit-il être considéré comme dangereux ?","a":{"A":"atteinte rénale aiguë chez le chat","B":"parce que cela hydrate trop","C":"parce que cela vaccine l’animal","D":"parce que cela remplace le calcium"},"ok":"A","expl":"Le danger principal est : atteinte rénale aiguë chez le chat."},{"cat":"Élevage / Structure","q":"Assurer le suivi individuel de chaque animal dans une structure d'élevage sert principalement à :","a":{"A":"Augmenter la densité d’animaux","B":"Éviter la communication en équipe","C":"Tracer soins, alimentation et observations","D":"Remplacer le vétérinaire"},"ok":"C","expl":"La traçabilité individuelle est essentielle pour assurer la continuité des soins et la qualité du suivi."},{"cat":"Élevage / Structure","q":"Le plan de nettoyage-désinfection d’une structure doit notamment préciser :","a":{"A":"Zones, fréquences, produits et méthode","B":"Le prix des chiots","C":"Le nom du plus beau chien","D":"La couleur des laisses"},"ok":"A","expl":"Un protocole utile doit être opérationnel et précis."},{"cat":"Élevage / Structure","q":"En collectivité, le mélange de chiens inconnus sans évaluation préalable augmente surtout le risque de :","a":{"A":"Meilleure socialisation automatique","B":"Baisse des fugues","C":"Conflits et blessures","D":"Disparition des maladies"},"ok":"C","expl":"L’évaluation préalable limite les incompatibilités."},{"cat":"Élevage / Structure","q":"Le cohorting consiste à :","a":{"A":"Supprimer l’isolement","B":"Mettre tous les animaux ensemble","C":"Changer tous les animaux de box chaque heure","D":"Regrouper des animaux selon leur statut sanitaire/compatibilité"},"ok":"D","expl":"Le cohorting est un outil d’organisation sanitaire."},{"cat":"Élevage / Structure","q":"En structure, la routine régulière a surtout pour intérêt de :","a":{"A":"Réduire l’agitation et le stress","B":"Empêcher le repos","C":"Remplacer l’enrichissement","D":"Augmenter les conflits"},"ok":"A","expl":"La prévisibilité rassure beaucoup d’animaux."},{"cat":"Biologie","q":"Le chien adulte possède :","a":{"A":"28 dents","B":"30 dents","C":"42 dents","D":"24 dents"},"ok":"C","expl":"La dentition adulte du chien comprend 42 dents."},{"cat":"Biologie","q":"Le chat adulte possède :","a":{"A":"42 dents","B":"28 dents","C":"24 dents","D":"30 dents"},"ok":"D","expl":"La dentition adulte du chat comprend 30 dents."},{"cat":"Biologie","q":"Le halètement chez le chien sert principalement à :","a":{"A":"Stimuler la lactation","B":"Accélérer la digestion","C":"Participer à la thermorégulation","D":"Augmenter la masse musculaire"},"ok":"C","expl":"Le halètement aide le chien à dissiper la chaleur."},{"cat":"Biologie","q":"Les vibrisses du chat sont surtout importantes pour :","a":{"A":"La production d’urine","B":"La vaccination","C":"Le repérage sensoriel et l’exploration","D":"La digestion des os"},"ok":"C","expl":"Les vibrisses sont des organes sensoriels spécialisés."},{"cat":"Biologie","q":"La génétique appliquée à l'élevage canin et félin sert notamment à :","a":{"A":"Déterminer la couleur du bâtiment","B":"Choisir la musique du chenil","C":"Réduire la consommation d’eau","D":"Mieux raisonner la reproduction et les risques héréditaires"},"ok":"D","expl":"Le raisonnement génétique en élevage vise à améliorer les qualités de la descendance et réduire les maladies héréditaires."},{"cat":"Santé","q":"L’objectif principal d’une vaccination est de :","a":{"A":"Éviter les litières","B":"Remplacer l’hygiène","C":"Traiter une fracture","D":"Prévenir une maladie ou en réduire la gravité"},"ok":"D","expl":"La vaccination prépare le système immunitaire."},{"cat":"Santé","q":"Un rappel vaccinal sert surtout à :","a":{"A":"Stériliser","B":"Maintenir/relancer la protection immunitaire","C":"Remplacer la vermifugation","D":"Diminuer l’immunité"},"ok":"B","expl":"Le rappel entretient la mémoire immunitaire."},{"cat":"Santé","q":"Une prévention antiparasitaire efficace doit être :","a":{"A":"Arrêtée dès qu’on ne voit plus de puces","B":"Adaptée au risque, à l’environnement et au mode de vie","C":"Identique pour tous sans réflexion","D":"Remplacée par du parfum"},"ok":"B","expl":"La prévention se raisonne selon le contexte."},{"cat":"Santé","q":"Une douleur peut être suspectée devant :","a":{"A":"Une gamelle vide","B":"Un clignement lent des yeux","C":"Une modification de posture, d’appétit ou de comportement","D":"Une couleur de poils différente"},"ok":"C","expl":"La douleur modifie souvent posture, interactions et appétit."},{"cat":"Alimentation","q":"Un aliment complet se définit comme :","a":{"A":"Un aliment couvrant les besoins nutritionnels du stade indiqué","B":"Un aliment uniquement carné","C":"Un aliment à compléter obligatoirement en vitamines","D":"Un aliment réservé aux chats"},"ok":"A","expl":"La notion d’aliment complet renvoie à l’équilibre nutritionnel."},{"cat":"Alimentation","q":"L’accès à une eau propre et fraîche doit être :","a":{"A":"Limité à deux fois par jour","B":"Réservé après l’exercice","C":"Permanent","D":"Supprimé la nuit"},"ok":"C","expl":"L’accès à l’eau est un besoin fondamental."},{"cat":"Comportement","q":"Le grattage/griffade chez le chat est :","a":{"A":"Uniquement lié à la faim","B":"Toujours pathologique","C":"Un signe de rage","D":"Un comportement normal d’entretien et de marquage"},"ok":"D","expl":"La griffade est un comportement normal et utile."},{"cat":"Comportement","q":"Un chat qui se toilette beaucoup peut :","a":{"A":"Ne jamais être stressé","B":"Être toujours en parfaite santé","C":"Être forcément agressif","D":"Exprimer un comportement normal, ou parfois un stress/problème médical si excessif"},"ok":"D","expl":"Le toilettage est normal, mais l’excès peut être problématique."},{"cat":"Bien-être","q":"La litière du chat doit idéalement être placée :","a":{"A":"Dans un lieu très bruyant","B":"Dans un endroit calme et accessible","C":"Près des gamelles","D":"Dans un couloir étroit très passant"},"ok":"B","expl":"Le placement influence l’usage de la litière."},{"cat":"Bien-être","q":"Un chien a besoin chaque jour :","a":{"A":"D’un seul repas géant","B":"Uniquement d’un couchage","C":"D’aucune stimulation","D":"De sorties et d’activités adaptées à son âge et à sa santé"},"ok":"D","expl":"L’activité adaptée fait partie du bien-être."},{"cat":"Réglementation","q":"La cession de chiens et de chats est interdite dans les foires, marchés, brocantes ou salons non spécifiquement consacrés aux animaux :","a":{"A":"Seulement pour les chats","B":"Vrai","C":"Faux","D":"Seulement pour les chiens de race"},"ok":"B","expl":"Le Code rural prévoit cette interdiction dans les manifestations non spécifiquement consacrées aux animaux."},{"cat":"Réglementation","q":"Lors d’une vente, le cédant doit notamment remettre :","a":{"A":"Une attestation de cession et un document d’information sur les besoins de l’animal","B":"Le permis de détention","C":"Uniquement une photo du chiot","D":"Un carnet de notes sans valeur"},"ok":"A","expl":"Le Code rural prévoit la remise d’une attestation de cession et d’un document d’information."},{"cat":"Santé","q":"En refuge, un chat présentant des lésions circulaires alopéciques doit faire suspecter notamment :","a":{"A":"Une fracture du fémur","B":"Une grossesse","C":"Une teigne","D":"Une hyperthyroïdie"},"ok":"C","expl":"Des lésions circulaires alopéciques doivent faire penser à une dermatophytose."},{"cat":"Santé","q":"La prise en charge d’un chat suspect de teigne en collectivité doit inclure :","a":{"A":"Isolement, protection du personnel, nettoyage renforcé","B":"Retour immédiat en groupe","C":"Aucune mesure tant que le chat mange","D":"Bain à l’eau claire uniquement"},"ok":"A","expl":"La teigne impose des mesures de biosécurité."},{"cat":"Santé","q":"Après morsure, une évaluation comportementale doit être réalisée :","a":{"A":"Après un an","B":"Seulement si le chien est catégorisé","C":"Jamais si l’animal est vacciné","D":"Avant la fin de la mise sous surveillance"},"ok":"D","expl":"DDPP rappelle l’évaluation comportementale avant la fin de la surveillance."},{"cat":"Comportement","q":"La prévention des morsures repose d’abord sur :","a":{"A":"Le rapport de force","B":"Le retrait de nourriture","C":"La lecture des signaux et l’évitement de la contrainte","D":"Le bruit"},"ok":"C","expl":"Comprendre les signaux d’inconfort est central."},{"cat":"Comportement","q":"En apprentissage, demander des critères trop difficiles trop vite entraîne souvent :","a":{"A":"Une meilleure socialisation","B":"Échec, frustration ou montée en stress","C":"Une progression plus rapide","D":"Une immunité supérieure"},"ok":"B","expl":"La progression doit rester réaliste."},{"cat":"Alimentation","q":"Une supplémentation sauvage en vitamines/minéraux peut surtout :","a":{"A":"Éviter toute consultation","B":"Créer des déséquilibres","C":"Toujours sécuriser une ration","D":"Remplacer l’os"},"ok":"B","expl":"BARF cite les compléments comme source possible de déséquilibre."},{"cat":"Alimentation","q":"Un excès d'aliments riches en amidon (pain, pommes de terre) dans la ration du chien peut être associé à :","a":{"A":"Des ballonnements","B":"Une baisse de croissance assurée","C":"Une meilleure dentition","D":"Une protection contre les parasites"},"ok":"A","expl":"Un excès d'amidon dans la ration peut provoquer des fermentations intestinales et des ballonnements."},{"cat":"Alimentation","q":"Les déchets de table donnés au chien ou au chat sont généralement présentés comme :","a":{"A":"Pouvant être une source de calories et micronutriments, avec précautions","B":"Uniquement digestibles pour le chat","C":"Interdits par la loi","D":"Toujours toxiques"},"ok":"A","expl":"Les déchets de table sont déconseillés car ils peuvent être déséquilibrés, trop salés ou contenir des aliments toxiques."},{"cat":"Pathologie","q":"Lors du diagnostic cytologique d'un mastocytome, l'examen histologique post-chirurgical est :","a":{"A":"Une exérèse chirurgicale large","B":"Une simple surveillance à vie sans chirurgie","C":"Un traitement unique par shampooing","D":"Une mise à jeun prolongée"},"ok":"A","expl":"La chirurgie large est indispensable, et l'examen histologique des marges confirme l'ablation complète de la tumeur."},{"cat":"Pathologie","q":"En cas d'extension d'un mastocytome, des cytoponctions complémentaires sont réalisées sur :","a":{"A":"Queue et phalanges","B":"Foie, rate ou moelle osseuse","C":"Poumon et cornée uniquement","D":"Cœur uniquement"},"ok":"B","expl":"Des cytoponctions du foie et de la rate peuvent être réalisées pour évaluer l'extension systémique du mastocytome."},{"cat":"Bien-être / Caudotomie","q":"Une conséquence possible de la caudotomie concerne :","a":{"A":"La disparition des chaleurs","B":"La stérilité automatique","C":"La chute des dents","D":"La communication visuelle entre chiens"},"ok":"D","expl":"L'amputation de la queue modifie la communication visuelle du chien avec ses congénères et avec l'humain."},{"cat":"Bien-être / Caudotomie","q":"Une gestion insuffisante de la douleur post-opératoire après une caudotomie peut notamment :","a":{"A":"Améliorer la communication","B":"Supprimer les automutilations","C":"Prolonger le temps de guérison","D":"Accélérer toujours la cicatrisation"},"ok":"C","expl":"Une douleur mal contrôlée après la caudotomie peut ralentir la cicatrisation et provoquer des comportements d'automutilation."},{"cat":"Élevage / Structure","q":"En structure, une double sécurité des portes/sas sert principalement à :","a":{"A":"Augmenter l’exercice","B":"Limiter les fugues","C":"Réduire la vaccination","D":"Améliorer la digestion"},"ok":"B","expl":"La maîtrise des flux évite les évasions."},{"cat":"Élevage / Structure","q":"Dans un protocole sanitaire, l’ordre 'propre vers sale' a pour objectif principal de :","a":{"A":"Réduire la contamination croisée","B":"Limiter les sorties","C":"Consommer plus de désinfectant","D":"Aller plus vite au nettoyage"},"ok":"A","expl":"Ce sens de progression est utilisé pour limiter les transferts d’agents infectieux."},{"cat":"Santé","q":"La giardiose s’exprime souvent principalement par :","a":{"A":"Une alopécie circulaire typique","B":"Une diarrhée parfois chronique/intermittente","C":"Une boiterie unique","D":"Une cataracte"},"ok":"B","expl":"Le tableau digestif est typique."},{"cat":"Santé","q":"La gestion de la giardiose en collectivité impose surtout :","a":{"A":"Hygiène environnementale rigoureuse et prise en charge vétérinaire","B":"Un changement de couleur des gamelles","C":"Une muselière","D":"Aucune mesure sur les selles"},"ok":"A","expl":"La gestion environnementale est essentielle."},{"cat":"Comportement","q":"Le meilleur moyen d’augmenter le sentiment de sécurité d’un chat nouvellement arrivé est :","a":{"A":"Lui imposer immédiatement tout le logement","B":"Lui offrir une zone de repli avec ressources","C":"Supprimer les cachettes","D":"Le manipuler souvent de force"},"ok":"B","expl":"Le contrôle et la possibilité de retrait sont essentiels."},{"cat":"Comportement","q":"Pour un chien sensible aux bruits, l’approche la plus pertinente est :","a":{"A":"Punition dès les premiers signes de peur","B":"Exposition maximale dès le premier jour","C":"Isolement complet sans travail","D":"Exposition graduelle associée à des renforçateurs adaptés"},"ok":"D","expl":"On recherche une désensibilisation progressive."},{"cat":"Réglementation","q":"Si le dossier de permis d’un chien catégorisé est incomplet ou si l’évaluation le justifie, le maire peut :","a":{"A":"Refuser la délivrance du permis","B":"Imposer une saillie","C":"Délivrer automatiquement le permis définitif","D":"Supprimer l’identification I-CAD"},"ok":"A","expl":"Le service public et les documents administratifs prévoient un refus possible si les conditions ne sont pas réunies."},{"cat":"Reproduction","q":"La prise de poids de la chienne pendant la gestation doit être :","a":{"A":"Toujours supérieure à 50 %","B":"Négative en fin de gestation","C":"Sans limite si la chienne mange bien","D":"Contrôlée pour éviter le surpoids et les difficultés de mise-bas"},"ok":"D","expl":"La prise de poids doit être contrôlée et progressive : une prise excessive augmente les risques de complications lors de la mise bas."},{"cat":"Réglementation","q":"Pourquoi un éleveur de chiens produisant plus d'une portée par an doit-il impérativement s'immatriculer avec un numéro SIREN/SIRET ?","a":{"A":"Parce que le numéro SIRET figure obligatoirement sur les pedigrees LOF délivrés par la Société Centrale Canine","B":"Parce que cette activité est considérée commerciale, rendant obligatoires déclaration fiscale et enregistrement professionnel","C":"Parce que l'immatriculation est requise pour accéder aux bases de données génétiques des races reconnues","D":"Pour bénéficier des aides agricoles européennes réservées aux éleveurs d'animaux de compagnie déclarés"},"ok":"B","expl":"Au-delà d'une portée par an, l'élevage est considéré comme une activité commerciale soumise à déclaration fiscale et immatriculation professionnelle (SIREN/SIRET)."},{"cat":"Réglementation","q":"En quoi consiste le programme TNRM pour les chats errants et quel est son cadre légal en France ?","a":{"A":"Un programme de stérilisation, identification, remise en liberté et suivi des chats errants, autorisé par arrêté municipal","B":"Un programme de vaccination uniquement des chats errants contre le coryza, financé par les collectivités locales","C":"Un programme de saisie administrative suivie d'adoption obligatoire via les refuges agréés par la SPA nationale","D":"Un programme d'euthanasie systématique des chats errants capturés, encadré par un arrêté vétérinaire national"},"ok":"A","expl":"Le programme TNRM (Trap, Neuter, Return, Manage) consiste à capturer, stériliser, identifier puis remettre en liberté les chats errants. Il est autorisé par arrêté municipal selon le Code rural."},{"cat":"Réglementation","q":"À quoi sert le fichier national I-CAD et quelles informations y sont enregistrées lors de l'identification d'un chien ?","a":{"A":"Il enregistre les antécédents médicaux et les vaccinations de chaque animal identifié sur le territoire national","B":"Il centralise les décisions d'euthanasie administrative et les signalements de morsures déclarées en mairie","C":"Il répertorie le numéro d'identification, l'espèce, la race, le signalement et les coordonnées du propriétaire","D":"Il classe les races de chiens autorisées en France et répertorie les clubs canins nationaux agréés par la SCC"},"ok":"C","expl":"I-CAD (Identification des Carnivores Domestiques) centralise le numéro d'identification, les informations sur l'animal (espèce, race, signalement) et les coordonnées du propriétaire."},{"cat":"Comportement","q":"Qu'est-ce que le comportement de 'freeze' (gel comportemental) chez un rongeur manipulé et comment doit-il être interprété ?","a":{"A":"Un réflexe de faim permettant au rongeur de concentrer toute son énergie sur la perception des stimuli alimentaires","B":"Un signe de confiance et de confort envers le propriétaire, le rongeur se sentant suffisamment en sécurité pour s'endormir","C":"Une réponse à la peur intense, le rongeur s'immobilisant pour imiter une proie morte et échapper au danger perçu","D":"Une pause digestive normale interrompant temporairement l'activité physique après l'ingestion d'un repas copieux"},"ok":"C","expl":"Le freeze est une réponse de peur intense : le rongeur s'immobilise pour simuler une proie morte, stratégie anti-prédateur. Il indique un stress élevé et non de la confiance."},{"cat":"Santé","q":"Quelle est la cause de la maladie des pattes rouges (red-leg) chez les amphibiens en captivité ?","a":{"A":"Une septicémie bactérienne principalement due à Aeromonas hydrophila, souvent fatale sans traitement rapide","B":"Une carence sévère en calcium provoquant des micro-hémorragies sous-cutanées visibles sur les membres","C":"Une infection parasitaire par des acariens aquatiques microscopiques présents dans l'eau non filtrée","D":"Une mutation pigmentaire bénigne déclenchée par les ultraviolets artificiels des terrariums mal réglés"},"ok":"A","expl":"La maladie des pattes rouges est une septicémie bactérienne causée principalement par Aeromonas hydrophila. Sans traitement antibiotique rapide, elle est souvent mortelle."},{"cat":"Comportement","q":"Pourquoi l'exposition précoce du chiot à des personnes variées (enfants, personnes âgées, porteurs d'équipements) est-elle essentielle ?","a":{"A":"Pour construire une habituation positive prévenant les peurs et l'agressivité envers ces profils à l'âge adulte","B":"Pour développer les aptitudes cognitives du chiot par stimulation sensorielle variée avant la fermeture des synapses","C":"Pour habituer le chiot à partager ses ressources alimentaires avec différents profils humains sans réaction défensive","D":"Pour faciliter les soins vétérinaires en habituant le chiot à être manipulé par des inconnus dès le plus jeune âge"},"ok":"A","expl":"Durant la période sensible de socialisation (3-14 semaines), l'exposition variée construit une habituation positive. Un chiot non socialisé à des profils variés peut développer peurs et agressivité à l'âge adulte."},{"cat":"Réglementation","q":"Quelles espèces de NAC sont concernées par la Convention CITES et quels documents leur détention peut-elle exiger ?","a":{"A":"Toutes les espèces de reptiles sans exception, les oiseaux et rongeurs domestiques en étant totalement exclus","B":"De nombreux reptiles, oiseaux et mammifères exotiques listés aux annexes I, II ou III nécessitant des certificats CITES","C":"Uniquement les mammifères de plus de 10 kg, les petits animaux étant exemptés de toute réglementation CITES","D":"Uniquement les espèces importées directement de pays non membres de l'Union Européenne depuis moins de 10 ans"},"ok":"B","expl":"La CITES protège de nombreux reptiles, oiseaux et mammifères exotiques classés en annexes I, II ou III. Leur détention, commerce ou transport nécessite des certificats CITES."},{"cat":"Réglementation","q":"Quels reptiles sont soumis à des restrictions particulières de détention pour les particuliers en France ?","a":{"A":"Uniquement les reptiles d'Afrique subsaharienne, les espèces américaines et asiatiques étant librement détenues","B":"Les espèces venimeuses dangereuses et certains grands varans classés susceptibles de représenter un danger pour l'Homme","C":"Tous les serpents sans exception, qu'ils soient venimeux ou non, selon un arrêté de 2004 toujours en vigueur","D":"Uniquement les reptiles importés après 2010, les espèces captives nées en France bénéficiant d'une exemption"},"ok":"B","expl":"Les espèces venimeuses dangereuses et certains grands varans sont classés 'susceptibles de présenter un danger' et soumis à autorisation préfectorale de détention."},{"cat":"Bien-être","q":"Pourquoi laisser un chien seul dans un véhicule fermé par temps chaud constitue-t-il une situation d'urgence vitale ?","a":{"A":"Parce que l'atmosphère confinée du véhicule concentre le CO2 expiré jusqu'à un niveau anoxique en 30 minutes","B":"Parce que les fenêtres condensent l'humidité exhalée, augmentant le taux d'humidité à un niveau suffocant rapidement","C":"Parce que la température intérieure peut atteindre 50 à 70°C en quelques minutes, provoquant un coup de chaleur mortel","D":"Parce que l'absence de stimulation visuelle extérieure provoque une anxiété de séparation aiguë potentiellement mortelle"},"ok":"C","expl":"Un véhicule au soleil peut atteindre 50 à 70°C en quelques minutes. Le chien, qui ne transpire pas et régule par le halètement, développe rapidement un coup de chaleur mortel."},{"cat":"Comportement","q":"Quels signes indiquent qu'un chat est en état de stress intense pendant un transport en voiture ?","a":{"A":"Il observe attentivement l'extérieur par les grilles de la caisse sans vocaliser ni changer de position","B":"Il mange son repas en voyage, ce qui indique une activation du système parasympathique de détente","C":"Il ronfle calmement et s'allonge dans sa caisse, signe d'une habituation réussie au mouvement du véhicule","D":"Il halète, urine ou défèque involontairement, vocalise intensément ou s'immobilise en état de freeze"},"ok":"D","expl":"Halètement, éliminations involontaires, vocalises intenses et freeze sont des signes de stress intense. Un chat détendu reste calme et ne vocalise pas excessivement."},{"cat":"Comportement","q":"Quelle méthode d'éducation est aujourd'hui reconnue comme la plus efficace et la plus respectueuse du bien-être canin ?","a":{"A":"L'utilisation combinée de punitions négatives et positives pour encadrer précisément les comportements indésirables","B":"Le renforcement positif associé aux techniques de contre-conditionnement et de désensibilisation progressive","C":"L'isolement en cage systématique lors de comportements indésirables, méthode dite de 'temps calme forcé'","D":"La méthode de dominance basée sur l'affirmation de l'autorité humaine par la contrainte physique systématique"},"ok":"B","expl":"Le renforcement positif combiné au contre-conditionnement et à la désensibilisation est reconnu par l'éthologie moderne comme la méthode la plus efficace et la plus respectueuse du bien-être canin."},{"cat":"Comportement","q":"Qu'est-ce que l'allogrooming entre chats familiers et quelle est sa signification sociale ?","a":{"A":"Un comportement d'agression ritualisée permettant d'établir la hiérarchie sans blessure physique réelle","B":"Le toilettage mutuel entre chats entretenant des liens sociaux positifs et renforçant la cohésion du groupe","C":"Un comportement de soumission du chat subalterne envers le chat dominant du groupe social établi","D":"Une stéréotypie de captivité observée uniquement chez les chats manquant de contact humain régulier"},"ok":"B","expl":"L'allogrooming est le toilettage mutuel entre chats liés socialement. Il renforce les liens affectifs du groupe, réduit les tensions et est un indicateur de relation positive."},{"cat":"Bien-être","q":"Pourquoi le furet doit-il bénéficier de sorties hors de sa cage pour des sessions de jeu quotidiennes ?","a":{"A":"Pour permettre une ventilation naturelle de la cage pendant que le furet explore l'espace de vie commun","B":"Pour maintenir l'hygiène de son espace de vie en le séparant régulièrement de ses déjections accumulées","C":"Parce que la réglementation française impose un minimum de 4 heures de liberté quotidienne pour les mustélidés","D":"Parce que le furet a un besoin éthologique intense d'exploration et de jeu, l'absence de sorties générant stéréotypies et obésité"},"ok":"D","expl":"Le furet est un mustélidé curieux et joueur avec un besoin éthologique fort d'exploration. Sans sorties quotidiennes, il développe stéréotypies, obésité et troubles comportementaux."},{"cat":"Bien-être","q":"Quelles précautions spécifiques s'imposent pour transporter un reptile tropical lors d'une consultation vétérinaire ?","a":{"A":"Le placer dans un aquarium rempli d'eau à sa température habituelle pour maintenir son hydratation cutanée","B":"Le transporter en sac opaque ou boîte ventilée hermétique à température stable adaptée à l'espèce","C":"Le réfrigérer légèrement pour ralentir son métabolisme et réduire ses besoins en oxygène pendant le trajet","D":"Le laisser libre dans l'habitacle pour qu'il thermorégule naturellement selon la chaleur du véhicule"},"ok":"B","expl":"Les reptiles tropicaux sont ectothermes et très sensibles aux variations thermiques. Un sac opaque ou boîte ventilée à température stable limite le stress et maintient leur physiologie."},{"cat":"Santé","q":"Comment un éleveur de chats Abyssins peut-il prévenir la transmission de l'atrophie progressive de la rétine (APR) dans sa lignée ?","a":{"A":"En croisement systématique avec une race indemne comme le Siamois pour diluer progressivement la mutation","B":"En testant génétiquement les reproducteurs et en n'accouplant pas deux individus porteurs de la mutation entre eux","C":"En supplémentant systématiquement les reproducteurs en vitamine A pour compenser la dégénérescence rétinienne","D":"En pratiquant un fond d'œil annuel sur tous les reproducteurs à partir de l'âge de 18 mois minimum"},"ok":"B","expl":"L'APR est une maladie autosomique récessive. Le test génétique identifie les porteurs sains. En n'accouplant jamais deux porteurs, on évite de produire des chatons atteints (homozygotes récessifs)."},{"cat":"Réglementation","q":"Qu'est-ce qu'un standard de race canine et qui est habilité à le définir officiellement ?","a":{"A":"Un guide nutritionnel spécifique à chaque race établi par les vétérinaires nutritionnistes membres de la SCC","B":"Un ensemble de tests comportementaux obligatoires permettant de classer les chiens de race selon leurs aptitudes","C":"Un document officiel décrivant les caractéristiques morphologiques et comportementales idéales, établi par le club de race national et reconnu par la FCI","D":"Un règlement intérieur de club définissant les conditions d'admission des chiens aux expositions canines régionales"},"ok":"C","expl":"Le standard de race est rédigé par le club de race du pays d'origine, puis reconnu et publié par la FCI. Il décrit les caractéristiques morphologiques et comportementales de référence."},{"cat":"Réglementation","q":"Quel est le rôle du LOOF (Livre Officiel des Origines Félines) dans la sélection des chats de race en France ?","a":{"A":"Il délivre les certificats vétérinaires de bonne santé requis pour la vente de chatons de race en France","B":"Il organise les expositions félines nationales et délivre les titres de champion pour les chats les mieux notés","C":"Il définit les rations alimentaires recommandées pour chaque race féline reconnue sur le territoire français","D":"Il gère l'enregistrement et la traçabilité généalogique des chats de race sous tutelle du Ministère de l'Agriculture"},"ok":"D","expl":"Le LOOF est le registre officiel des pedigrees félins en France, sous tutelle du Ministère de l'Agriculture. Il assure la traçabilité généalogique des chats de race."},{"cat":"Bien-être","q":"Pourquoi les rongeurs herbivores comme les lapins, cobayes et chinchillas doivent-ils avoir accès à des éléments à ronger en permanence ?","a":{"A":"Parce que leurs dents à croissance continue doivent être usées en permanence pour prévenir les malocclusions douloureuses","B":"Pour leur fournir un enrichissement comportemental réduisant l'ennui en l'absence de congénères dans l'enclos","C":"Pour solidifier l'émail de leurs incisives, naturellement plus fragile que celui des rongeurs omnivores sauvages","D":"Pour stimuler leur appétit et maintenir un transit digestif actif grâce à la salivation induite par le rongement"},"ok":"A","expl":"Les dents des rongeurs herbivores poussent en continu tout au long de leur vie. Sans usure suffisante, elles provoquent des malocclusions douloureuses pouvant entraîner anorexie et mort."},{"cat":"Comportement","q":"Entre quels âges se situe la période de socialisation primaire du chiot, critique pour son développement comportemental ?","a":{"A":"Entre 6 mois et 1 an, période d'apprentissage secondaire où le chiot consolide ses acquis comportementaux","B":"Entre 4 et 8 semaines uniquement, correspondant à la période de sensibilité maximale aux stimuli sociaux","C":"Entre 3 et 14 semaines, fenêtre durant laquelle le cerveau est le plus plastique pour l'intégration de stimuli","D":"Entre 12 et 18 mois, soit après la puberté qui marque réellement la fin de la sensibilité sociale primaire"},"ok":"C","expl":"La période de socialisation primaire s'étend de 3 à 14 semaines. C'est la fenêtre de plasticité maximale du cerveau pour intégrer stimuli sociaux, environnementaux et sensoriels."},{"cat":"Bien-être","q":"Pourquoi le hamster syrien (hamster doré) doit-il impérativement être hébergé seul dans son espace de vie ?","a":{"A":"Parce qu'un second hamster perturbe son cycle de sommeil naturellement inversé par rapport à celui de l'Homme","B":"Parce qu'il consomme deux fois plus de nourriture en présence d'un congénère, rendant la gestion des rations difficile","C":"Parce que sa reproduction est trop rapide en cohabitation mixte et difficile à maîtriser pour un particulier","D":"Parce qu'il est strictement solitaire à l'état naturel et que la cohabitation avec un adulte entraîne des combats mortels"},"ok":"D","expl":"Le hamster syrien est un animal strictement solitaire et territorial. La cohabitation entre adultes génère des combats pouvant être mortels, même entre individus du même sexe."},{"cat":"Bien-être","q":"Quelle durée maximale de transport sans pause est recommandée pour préserver le bien-être d'un chien adulte ?","a":{"A":"8 heures sans interruption, durée réglementaire maximale fixée par le règlement européen CE 1/2005","B":"2 heures maximum, correspondant au seuil de tolérance au stress établi pour les races brachycéphales","C":"4 heures maximum, au-delà desquelles une pause d'au moins 20 minutes est recommandée","D":"1 heure uniquement, les chiens ne supportant pas les vibrations prolongées des moyens de transport modernes"},"ok":"C","expl":"Il est recommandé de ne pas dépasser 4 heures de transport sans pause. Au-delà, une pause d'au moins 20 à 30 minutes est préconisée pour que l'animal puisse se dégourdir et s'hydrater."},{"cat":"Bien-être","q":"Comment un chat doit-il être transporté de façon optimale lors d'une consultation vétérinaire ?","a":{"A":"En laisse et harnais, permettant au chat de se déplacer librement tout en restant sécurisé dans la salle d'attente","B":"Dans une caisse de transport adaptée, recouverte d'un tissu pour limiter les stimuli visuels stressants","C":"Dans un sac à dos ventral transparent permettant au chat d'observer son environnement pendant le trajet","D":"Porté dans les bras du propriétaire pour maintenir le contact rassurant et éviter le stress de confinement"},"ok":"B","expl":"Une caisse adaptée offre un espace sécurisé. La recouvrir d'un tissu limite les stimuli visuels stressants (autres animaux, inconnus) et réduit significativement l'anxiété du chat."},{"cat":"Santé","q":"À quoi sert un test génétique ADN dans le contexte de l'élevage canin responsable ?","a":{"A":"À calculer le coefficient de consanguinité exact d'un individu à partir de son génome complet séquencé","B":"À identifier si un chien est porteur sain, atteint ou indemne d'une maladie héréditaire spécifique","C":"À déterminer le groupe sanguin canin avant une transfusion ou une chirurgie lourde chez l'adulte reproducteur","D":"À confirmer la race d'un chien sans pedigree pour permettre son inscription au LOF à titre exceptionnel"},"ok":"B","expl":"Le test ADN détermine le statut génétique (indemne, porteur sain ou atteint) pour une maladie héréditaire spécifique, permettant à l'éleveur de faire des accouplements raisonnés."},{"cat":"Réglementation","q":"Quelle méthode de sécurisation d'un chien en voiture est conforme au Code de la route français ?","a":{"A":"L'installer dans le coffre ouvert d'un break, permettant la ventilation et évitant les obstructions visuelles","B":"Utiliser une cage homologuée fixée, un harnais attaché à la ceinture ou une grille de séparation adaptée","C":"Le placer dans les bras d'un passager à l'arrière, seule position garantissant une surveillance constante de l'animal","D":"Le laisser assis sur le siège arrière avec une laisse maintenue par la main du passager pendant le trajet"},"ok":"B","expl":"Le Code de la route interdit tout objet ou animal pouvant gêner la conduite. Cage homologuée, harnais ceinture ou grille de séparation sont les seules solutions conformes."},{"cat":"Comportement","q":"Qu'est-ce qu'un signal d'apaisement chez le chien et comment aident-ils dans les interactions sociales ?","a":{"A":"Des vocalises spécifiques émises pour signaler une disponibilité sexuelle aux congénères proches","B":"Des postures d'attaque ritualisées permettant d'établir une hiérarchie sans combat physique réel","C":"Des comportements de jeu codifiés permettant d'initier une interaction ludique avec un autre chien","D":"Des signaux subtils (bâillement, léchage de truffe, détournement du regard) utilisés pour désamorcer les tensions"},"ok":"D","expl":"Les signaux d'apaisement (Turid Rugaas) sont des comportements subtils — bâillement, léchage de truffe, détournement du regard, se gratter — que le chien utilise pour désamorcer les tensions sociales."},{"cat":"Élevage","q":"Quelle distinction fondamentale sépare une race féline dite 'naturelle' d'une race 'créée' par les éleveurs ?","a":{"A":"Les races naturelles sont reconnues par la FCI tandis que les races créées relèvent uniquement des clubs félins nationaux","B":"Les races naturelles sont systématiquement plus résistantes aux maladies génétiques que les races issues de croisements intentionnels","C":"Une race naturelle a émergé spontanément dans une population isolée géographiquement, une race créée résulte de croisements planifiés","D":"Les races naturelles sont exclusivement à poil long tandis que les races créées sont à poil court ou sans poil"},"ok":"C","expl":"Une race naturelle (Maine Coon, Siamois, Persan) a émergé par sélection naturelle ou géographique. Une race créée (Bengal, Ragdoll) résulte de croisements intentionnels planifiés par des éleveurs."},{"cat":"Comportement","q":"Pourquoi le griffoir remplit-il une fonction comportementale irremplaçable pour le chat, au-delà de l'usure des griffes ?","a":{"A":"Parce qu'il permet le dépôt de phéromones interdigitales assurant le marquage territorial et procure un étirement musculaire","B":"Parce qu'il permet au chat de se mesurer visuellement à ses congénères en laissant des marques en hauteur","C":"Parce qu'il représente un obstacle moteur stimulant le développement musculaire des membres antérieurs","D":"Parce qu'il constitue un point de repère tactile aidant le chat à se localiser dans son espace de vie"},"ok":"A","expl":"Le griffage dépose des phéromones des glandes interdigitales (marquage olfactif), laisse des traces visuelles (marquage visuel) et procure un étirement musculaire essentiel."},{"cat":"Élevage","q":"Quel est l'objectif des tests de comportement (tests de caractère) utilisés en sélection canine ?","a":{"A":"Déterminer le niveau d'anxiété du chien afin de lui prescrire un traitement anxiolytique adapté avant la reproduction","B":"Évaluer le tempérament et les aptitudes des géniteurs pour orienter la sélection vers un caractère conforme au standard","C":"Remplacer la vaccination antirabique pour les chiens jugés suffisamment stables émotionnellement lors du test","D":"Classer les chiens selon leur agressivité pour justifier leur inclusion dans les catégories 1 ou 2 légales"},"ok":"B","expl":"Les tests de caractère évaluent le tempérament, la stabilité émotionnelle et les aptitudes des reproducteurs. Ils permettent d'orienter la sélection vers un caractère équilibré conforme au standard."},{"cat":"Élevage","q":"Pourquoi la consanguinité étroite est-elle particulièrement problématique dans les élevages de petits rongeurs comme le hamster syrien ?","a":{"A":"Parce qu'elle rend la gestation plus longue et les portées moins nombreuses en raison d'anomalies chromosomiques fréquentes","B":"Parce que la base génétique fondatrice des populations captives est déjà réduite, accélérant l'accumulation des maladies récessives","C":"Parce qu'elle augmente les conflits interspécifiques lors des introductions de nouveaux individus dans le groupe","D":"Parce que les individus consanguins refusent systématiquement de se reproduire, reconnaissant leurs apparentés par olfaction"},"ok":"B","expl":"Les populations captives de hamsters syriens descendent d'un nombre très réduit de fondateurs. La consanguinité accentue cette diversité déjà faible, favorisant l'expression de maladies récessives."},{"cat":"Élevage","q":"Quels risques génétiques principaux présente une consanguinité excessive dans une lignée canine ?","a":{"A":"Une augmentation de la taille des portées liée à la stimulation hormonale des femelles consanguines reproductrices","B":"Une augmentation de la prévalence des maladies génétiques récessives et une dépression de la vigueur hybride","C":"Une homogénéisation bénéfique du phénotype facilitant le travail de sélection morphologique des éleveurs","D":"Un renforcement du système immunitaire par sélection des individus résistants aux pathogènes locaux dominants"},"ok":"B","expl":"La consanguinité augmente l'homozygotie, favorisant l'expression des allèles récessifs délétères et réduisant la vigueur hybride (dépression de consanguinité), avec moins de vitalité et de fertilité."},{"cat":"Comportement","q":"Quel comportement du lapin indique un état de bien-être et de détente maximaux dans son environnement ?","a":{"A":"Il se tient redressé sur ses pattes arrières en orientant les oreilles dans toutes les directions","B":"Il court en cercles rapides dans son enclos, s'arrêtant brusquement et repartant dans le sens opposé","C":"Il s'étire à plat ou s'allonge sur le côté, jambes complètement déployées, dans la position dite 'pancake'","D":"Il tape frénétiquement le sol avec ses pattes arrières en émettant de courtes vocalises répétées"},"ok":"C","expl":"La position 'pancake' (lapin allongé à plat, jambes déployées) est le signe ultime de détente et de sécurité. Un lapin stressé ne se permettrait pas une posture aussi vulnérable."},{"cat":"Bien-être","q":"Pourquoi la sélection pour des traits morphologiques extrêmes comme le brachycéphalisme sévère est-elle controversée éthiquement ?","a":{"A":"Parce qu'elle est interdite par la réglementation française depuis la loi du 30 novembre 2021 sur le bien-être animal","B":"Parce qu'elle augmente les coûts de reproduction pour les éleveurs sans améliorer la qualité génétique réelle","C":"Parce qu'elle entraîne des pathologies chroniques (difficultés respiratoires, problèmes oculaires) affectant le bien-être toute la vie","D":"Parce qu'elle réduit la valeur marchande des animaux en limitant leur attrait pour les acheteurs exigeants"},"ok":"C","expl":"Le brachycéphalisme sévère génère un syndrome obstructif chronique (BOAS), des problèmes oculaires et dentaires. L'animal souffre toute sa vie d'une conformation délibérément sélectionnée par l'Homme."},{"cat":"Comportement","q":"Que signifient des pupilles très dilatées chez un chat dans un environnement calme et bien éclairé ?","a":{"A":"Un état d'activation émotionnelle forte : peur intense, stress maximal ou excitation extrême","B":"Un état de relaxation profonde et de contentement associé à la production endogène d'endorphines","C":"Un signe de carence en vitamine A affectant progressivement la régulation du reflexe pupillaire","D":"Un effet secondaire transitoire des traitements antiparasitaires administrés par voie spot-on cutanée"},"ok":"A","expl":"Les pupilles se dilatent en réponse à une activation du système nerveux sympathique. Dans un environnement calme et éclairé, des pupilles très dilatées signalent un stress intense, une peur ou une excitation extrême."},{"cat":"Réglementation","q":"Quel règlement peut s'appliquer lors du transport de nombreux chats (plus de 5) par une association de protection animale ?","a":{"A":"Le règlement CE 1/2005 sur la protection des animaux pendant le transport si l'activité est assimilée à commerciale","B":"Aucun règlement particulier, les associations bénéficiant d'un régime dérogatoire pour les transports d'animaux sauvés","C":"Le Code de la consommation uniquement, les associations n'étant pas soumises aux réglementations commerciales","D":"L'arrêté du 3 avril 2014 uniquement, applicable à toute structure hébergeant des chats quelle que soit l'activité"},"ok":"A","expl":"Le règlement CE 1/2005 peut s'appliquer lorsque le transport est assimilé à une activité commerciale, même pour une association. Le nombre d'animaux et la nature de l'activité sont des critères d'appréciation."},{"cat":"Bien-être","q":"Quelles précautions prendre pour transporter un perroquet vers une nouvelle maison ou lors d'une consultation vétérinaire ?","a":{"A":"Utiliser une cage de transport plus petite avec une seule perche basse, recouverte d'un tissu, à température stable","B":"Le transporter dans sa cage habituelle pleine de jouets et perchoirs pour maintenir ses repères familiers","C":"Le sédater légèrement avec un anxiolytique avicole pour prévenir les traumatismes de vol paniqué en voiture","D":"Le laisser libre dans l'habitacle pour qu'il s'installe spontanément à l'endroit le plus confortable"},"ok":"A","expl":"Une cage de transport plus petite limite les chutes. Une seule perche basse réduit les risques de traumatisme. Le tissu limite les stimuli visuels stressants et maintient une température stable."},{"cat":"Réglementation","q":"Quelle réglementation française encadre l'identification obligatoire des chats et l'enregistrement de leurs données ?","a":{"A":"Le règlement européen 576/2013 sur les mouvements transfrontaliers des animaux de compagnie","B":"L'arrêté préfectoral annuel de chaque département définissant localement les obligations d'identification féline","C":"La loi du 6 janvier 1999 relative aux animaux dangereux, étendue aux chats par décret en 2004","D":"Le Code rural article L214-8, imposant l'identification par puce ou tatouage avant toute cession avec enregistrement I-CAD"},"ok":"D","expl":"L'article L214-8 du Code rural impose l'identification (puce ou tatouage) de tout chat avant sa cession et son enregistrement obligatoire dans le fichier national I-CAD."},{"cat":"Comportement","q":"Pourquoi le chat supporte-t-il généralement moins bien le transport que le chien de façon structurelle ?","a":{"A":"Parce que c'est un animal territorial semi-solitaire très sensible aux changements d'environnement et aux odeurs inconnues","B":"Parce que sa fréquence cardiaque de base est trop élevée pour supporter les variations de vitesse et d'accélération","C":"Parce que sa morphologie compacte lui impose une posture inconfortable dans toute caisse de transport standard","D":"Parce que ses vibrisses (moustaches) captent les vibrations des moteurs à une intensité douloureuse pour l'espèce"},"ok":"A","expl":"Le chat est un animal territorial et semi-solitaire. Le transport le sort de son territoire olfactif familier et l'expose à des odeurs inconnues, ce qui est structurellement plus stressant que pour le chien social."},{"cat":"Réglementation","q":"Qu'est-ce que le certificat de capacité (CdC) et pour quelles activités est-il exigé en France ?","a":{"A":"Une autorisation administrative préfectorale personnelle requise pour détenir et/ou reproduire certaines espèces non domestiques","B":"Un document équivalent au ACACED pour les propriétaires d'animaux de compagnie exotiques non domestiqués","C":"Un certificat sanitaire délivré par un vétérinaire agréé attestant de la bonne santé des animaux d'un établissement","D":"Un diplôme universitaire en biologie animale délivré par les établissements accrédités par le Ministère de l'Agriculture"},"ok":"A","expl":"Le Certificat de Capacité est une autorisation préfectorale personnelle nominative. Il est requis pour toute activité impliquant la détention, l'élevage ou la présentation au public d'espèces non domestiques."},{"cat":"Bien-être","q":"Pourquoi les cobayes et lapins sont-ils particulièrement vulnérables aux coups de chaleur lors des transports estivaux ?","a":{"A":"Parce que leur capacité de thermorégulation est très limitée : ils ne transpirent pas efficacement et haletent peu","B":"Parce que leur fourrure épaisse empêche toute dissipation de la chaleur corporelle même en environnement ventilé","C":"Parce que leurs voies respiratoires courtes les rendent incapables de filtrer l'air chaud inspiré en été","D":"Parce que leur consommation d'eau augmente de 500 % en situation de stress thermique, accélérant la déshydratation"},"ok":"A","expl":"Cobayes et lapins ne transpirent pas et haletent peu, ce qui limite fortement leur capacité à dissiper la chaleur. Ils sont très vulnérables aux fortes températures, avec un risque mortel rapide."},{"cat":"Comportement","q":"Qu'est-ce que la plumée (arrachage de plumes) chez un perroquet en captivité et quelles en sont les causes principales ?","a":{"A":"Un signe d'hypervitaminose A provoquant des démangeaisons et une fragilisation du follicule pileux de la plume","B":"Un phénomène de mue accélérée saisonnier normal chez les psittacidés en captivité mal chauffée en hiver","C":"Un comportement naturel de toilettage excessif observé uniquement chez les espèces à plumage dense et abondant","D":"Un trouble compulsif grave lié à l'ennui, au stress, à la solitude ou à des causes médicales sous-jacentes"},"ok":"D","expl":"La plumée est un trouble compulsif grave du comportement. Ses causes principales sont l'ennui, la solitude, le stress et le manque de stimulation, mais aussi des causes médicales (infections, parasites)."},{"cat":"Réglementation","q":"Quel mode d'identification est obligatoire pour tout chien en France et avant quelle limite d'âge doit-il être réalisé ?","a":{"A":"Une puce électronique ISO uniquement, le tatouage ayant été interdit par la réglementation européenne depuis 2016","B":"Un collier avec médaille gravée du nom et du numéro de téléphone, obligatoire avant la première sortie publique","C":"Une puce électronique ISO ou un tatouage, obligatoire avant toute cession et au plus tard à 4 mois","D":"Un tatouage alphanumérique dans l'oreille ou l'aine, obligatoire avant la cession et au plus tard à 6 mois"},"ok":"C","expl":"L'identification du chien (puce ISO ou tatouage) est obligatoire avant toute cession et au plus tard à l'âge de 4 mois, selon le Code rural."},{"cat":"Comportement","q":"Comment distinguer le marquage urinaire par spray de la malpropreté classique chez le chat ?","a":{"A":"Le marquage consiste à projeter de petites quantités sur des surfaces verticales, la malpropreté à vider la vessie sur des surfaces horizontales","B":"Le marquage survient exclusivement la nuit et la malpropreté uniquement en journée en l'absence du propriétaire","C":"Le marquage est toujours accompagné de vocalises intenses tandis que la malpropreté est silencieuse et rapide","D":"Le marquage concerne uniquement les chats mâles entiers tandis que la malpropreté touche tous les individus"},"ok":"A","expl":"Le marquage par spray se fait debout, queue vibrante, sur des surfaces verticales (murs, meubles) en petites quantités. La malpropreté consiste à uriner en position accroupie sur des surfaces horizontales."},{"cat":"Réglementation","q":"Quels documents sont obligatoires pour voyager avec son chien dans un pays de l'Union Européenne ?","a":{"A":"Uniquement la carte d'identité du propriétaire et le carnet de santé national avec vaccinations à jour","B":"Une assurance responsabilité civile internationale et un bilan sanguin titrage antirabique de moins de 3 mois","C":"Un simple certificat vétérinaire de moins de 10 jours et la preuve d'achat de l'animal datant de moins de 5 ans","D":"Un passeport européen pour animaux, une identification par transpondeur ISO et une vaccination antirabique valide"},"ok":"D","expl":"Pour voyager dans l'UE, le chien doit disposer d'un passeport européen, d'une identification par puce ISO (transpondeur) et d'une vaccination antirabique en cours de validité."},{"cat":"Réglementation","q":"Quelle est la portée de l'obligation légale de stérilisation pour les propriétaires de chats en France selon la réglementation nationale actuelle ?","a":{"A":"Elle est obligatoire uniquement pour les chats mâles entiers vivant en appartement dans les zones urbaines denses","B":"Elle est obligatoire pour tout chat de plus de 6 mois vivant dans un foyer comptant déjà un autre chat","C":"Elle n'est pas une obligation nationale mais peut être imposée localement par arrêté municipal pour les chats errants","D":"Elle est obligatoire pour tous les chats cédés à titre onéreux depuis l'entrée en vigueur de la loi de 2021"},"ok":"C","expl":"Il n'existe pas d'obligation nationale de stérilisation pour les chats de particuliers. En revanche, un arrêté municipal peut imposer la stérilisation des chats errants dans certaines communes."},{"cat":"Réglementation","q":"Qu'est-ce que le certificat d'engagement et de connaissance instauré par la loi de 2021 et comment fonctionne-t-il ?","a":{"A":"Un diplôme délivré par l'établissement d'élevage certifiant que le futur propriétaire a suivi une formation","B":"Un contrat commercial bilatéral garantissant le remboursement de l'animal en cas de maladie dans les 30 jours","C":"Un document signé par le vétérinaire attestant que l'animal est en bonne santé au moment de sa cession","D":"Un document informatif remis à l'acquéreur au moins 7 jours avant la cession, signé par les deux parties"},"ok":"D","expl":"La loi du 30 novembre 2021 impose la remise d'un certificat d'engagement et de connaissance au moins 7 jours avant la cession, signé par cédant et acquéreur, détaillant les besoins de l'animal."},{"cat":"Réglementation","q":"Quelles normes les caisses de transport utilisées pour le transport aérien des chiens doivent-elles respecter ?","a":{"A":"Les normes ISO 14001 relatives au management environnemental des entreprises de transport international d'animaux","B":"Les normes IATA (Live Animals Regulations) définissant dimensions minimales, ventilation et résistance des contenants","C":"Les normes NF françaises établies par l'AFNOR spécifiquement pour le transport terrestre et aérien des carnivores","D":"Les normes de l'OMS applicables au transport international des animaux susceptibles de porter des zoonoses"},"ok":"B","expl":"Le transport aérien des animaux est régi par les normes IATA (Live Animals Regulations) qui définissent les dimensions minimales, la ventilation, les matériaux et la résistance des contenants."},{"cat":"Réglementation","q":"Quelles obligations s'appliquent à une animalerie qui vend des NAC comme des lapins, rongeurs et oiseaux en France ?","a":{"A":"Un agrément préfectoral, personnel ACACED, registre des animaux et respect des conditions de bien-être réglementaires","B":"Aucune obligation spécifique, les NAC relevant d'une réglementation allégée par rapport aux chiens et chats","C":"Uniquement la déclaration annuelle du nombre d'animaux vendus auprès de la Direction Départementale des Territoires","D":"Seulement l'affichage obligatoire du prix de vente et de l'origine de l'animal sur chaque cage ou enclos d'exposition"},"ok":"A","expl":"Toute animalerie vendant des animaux vivants doit disposer d'un agrément préfectoral, employer du personnel titulaire de l'ACACED, tenir un registre des animaux et respecter les normes de bien-être."},{"cat":"Comportement","q":"Quelle combinaison de comportements indique qu'un chat se sent en sécurité et détendu dans son environnement ?","a":{"A":"Morsures légères répétées sur la main du propriétaire suivies d'un toilettage intensif de la zone mordue","B":"Ronronnement, pétrissage des surfaces molles et position allongée exposant le ventre à une personne familière","C":"Dos arrondi, poils hérissés et queue gonflée en position verticale lors d'une approche humaine non sollicitée","D":"Oreilles couchées en arrière, pupilles très dilatées et mâchoires légèrement entrouvertes émettant un sifflement"},"ok":"B","expl":"Ronronnement, pétrissage (comportement néonatal de confort) et exposition du ventre sont des signes de bien-être et de confiance maximaux. Un chat exposant son ventre se sent totalement en sécurité."},{"cat":"Élevage","q":"Quel principe éthique fondamental doit primer dans toute démarche de sélection responsable d'animaux de compagnie ?","a":{"A":"La conformité morphologique stricte au standard actuel, seul critère objectif et universel reconnu par les juges","B":"La rentabilité économique de l'élevage, condition sine qua non de sa viabilité et de sa pérennité à long terme","C":"La priorité accordée à la santé, au bien-être et à la fonctionnalité de l'animal sur les critères purement esthétiques","D":"La production du plus grand nombre de descendants pour maximiser la diffusion des gènes sélectionnés dans la population"},"ok":"C","expl":"L'éthique de l'élevage responsable place la santé, le bien-être et la fonctionnalité au premier plan. La beauté et la conformité au standard ne doivent jamais se faire au détriment de la qualité de vie."},{"cat":"Comportement","q":"Qu'est-ce qu'une stéréotypie comportementale chez un chien hébergé en chenil et que signifie-t-elle ?","a":{"A":"Un comportement de jeu répétitif normal observé chez les chiens jeunes confinés en l'absence de congénères","B":"Un comportement de marquage territorial codifié observé uniquement chez les chiens entiers en chenil","C":"Un comportement répétitif et invariant sans but apparent, signe d'un état de détresse chronique","D":"Un apprentissage involontaire de routines spatiales lié à l'habituation progressive à l'espace de vie"},"ok":"C","expl":"Une stéréotypie est un comportement répétitif, invariant et sans fonction apparente (tourne en rond, mordille les barreaux…). Elle signale un état de détresse chronique lié à un environnement appauvri."},{"cat":"Réglementation","q":"Que stipule la loi du 30 novembre 2021 concernant la publication d'annonces de cession de chats sur internet ?","a":{"A":"Elle oblige le dépôt d'une caution remboursable auprès de la mairie avant toute publication d'annonce de vente","B":"Elle interdit toute publication d'annonces de chats sur les plateformes généralistes quelle que soit leur nature","C":"Elle limite le nombre d'annonces de cession à titre gratuit à deux par an et par particulier sur internet","D":"Elle impose que toute annonce mentionne le numéro d'identification de l'animal et interdit les annonces sans ce numéro"},"ok":"D","expl":"La loi du 30 novembre 2021 impose que toute annonce de cession d'un chien ou chat mentionne le numéro d'identification de l'animal. Les annonces sans numéro d'identification sont interdites."},{"cat":"Santé","q":"Qu'est-ce qu'une zoonose et quels exemples concernent directement les propriétaires d'animaux de compagnie en France ?","a":{"A":"Une maladie transmissible entre animaux sauvages uniquement, ne concernant pas les animaux de compagnie","B":"Une maladie transmissible naturellement entre animaux et Homme : leptospirose, teigne, toxoplasmose, salmonellose","C":"Une maladie spécifique aux élevages intensifs, absente chez les animaux de compagnie vivant en famille","D":"Une maladie génétique héréditaire partagée entre l'Homme et les animaux domestiques par évolution parallèle"},"ok":"B","expl":"Une zoonose est une maladie transmissible naturellement entre l'animal et l'Homme. Les exemples courants pour les propriétaires d'animaux de compagnie : leptospirose, teigne, toxoplasmose, salmonellose."},{"cat":"Réglementation","q":"Qu'implique concrètement le statut de 'reconnaissance constitutionnelle de la sensibilité animale' instauré en France en 2021 ?","a":{"A":"L'interdiction immédiate de toute activité commerciale impliquant des animaux vivants sur le territoire français","B":"L'octroi aux animaux d'une personnalité juridique identique à celle des personnes physiques devant les tribunaux","C":"La création d'un tribunal spécialisé dans le jugement des infractions relatives aux mauvais traitements animaliers","D":"Le renforcement de la base légale des protections animales et la justification de l'évolution progressive des réglementations"},"ok":"D","expl":"La reconnaissance de la sensibilité animale renforce la base légale des protections existantes et justifie l'évolution progressive des réglementations en faveur du bien-être animal, sans accorder de personnalité juridique."},{"cat":"Santé","q":"Quel est généralement le premier signe clinique observable d'une maladie chez un psittacidé (perroquet, perruche) en captivité ?","a":{"A":"Des selles plus colorées en vert intense, signe d'une atteinte hépatique ou d'une infection bactérienne","B":"Une augmentation des vocalises et une hyperactivité soudaine dénotant une réponse immunitaire précoce","C":"Des plumes ébouriffées, une posture avachie sur le perchoir et une activité nettement réduite","D":"Un bec plus pâle et moins brillant, signe d'une anémie légère précédant les symptômes systémiques graves"},"ok":"C","expl":"Les oiseaux masquent naturellement leurs symptômes jusqu'à être très affaiblis. Le premier signe visible est généralement les plumes ébouriffées avec posture avachie sur le perchoir et réduction d'activité."},{"cat":"Bien-être","q":"Quelles mesures concrètes aident un chat anxieux à mieux tolérer les transports en voiture ?","a":{"A":"Diffuser de la musique forte pendant le trajet pour couvrir les bruits extérieurs perturbants du moteur","B":"Fixer la caisse sans rembourrage sur la banquette arrière pour que le chat ressente bien les vibrations du moteur","C":"Habituer progressivement la caisse à la maison et utiliser des phéromones apaisantes (Feliway) dans la caisse","D":"Le nourrir généreusement juste avant le départ pour l'occuper et réduire son attention aux stimuli du voyage"},"ok":"C","expl":"La désensibilisation progressive à la caisse et l'utilisation de phéromones apaisantes (Feliway — analogue des phéromones faciales du chat) sont les approches les plus efficaces contre l'anxiété de transport."},{"cat":"Élevage","q":"Pourquoi le croisement Scottish Fold × Scottish Fold est-il interdit dans de nombreux pays et déconseillé par les vétérinaires ?","a":{"A":"Parce que les chatons issus de ce croisement naissent sans capacité auditive, leur pavillon auriculaire étant fusionné","B":"Parce que les portées issues de ce croisement comptent en moyenne moins de deux chatons viables par portée","C":"Parce qu'il produit systématiquement des chatons albinos atteints de cécité congénitale bilatérale irréversible","D":"Parce que le gène des oreilles repliées en état homozygote cause une ostéochondrodysplasie sévère et douloureuse"},"ok":"D","expl":"Le gène Fd responsable des oreilles repliées est dominant. Homozygote (Fd/Fd), il cause une ostéochondrodysplasie généralisée sévère : douleurs chroniques, arthrite, déformations osseuses toute la vie."},{"cat":"Comportement","q":"Quelle posture corporelle caractérise le comportement de soumission chez le chien face à un congénère dominant ?","a":{"A":"Corps légèrement penché en avant, pattes avant abaissées, queue horizontale et vocalises douces répétées","B":"Corps dressé, oreilles pointées vers l'avant, queue en l'air et regard direct maintenu vers l'autre chien","C":"Corps bas ou à plat, ventre exposé, queue entre les pattes, oreilles plaquées et regard dévié","D":"Corps rigide, poils dressés sur l'échine, grognement sourd et position latérale face à l'autre chien"},"ok":"C","expl":"La posture de soumission active ou passive inclut corps abaissé ou allongé, ventre exposé, queue entre les pattes, oreilles couchées et regard dévié pour éviter la confrontation."},{"cat":"Réglementation","q":"À quoi sert le passeport européen pour animaux de compagnie et dans quels pays est-il reconnu ?","a":{"A":"Un document délivré par les douanes au moment du franchissement de la frontière après contrôle sanitaire de l'animal","B":"Un document valable uniquement pour le transport aérien, les autres modes de transport relevant d'autres formulaires","C":"Un document valable dans tous les États membres de l'UE et certains pays tiers pour les voyages non commerciaux","D":"Un document national valable uniquement sur le territoire français pour les déplacements de plus de 48 heures"},"ok":"C","expl":"Le passeport européen pour animaux est reconnu dans tous les États membres de l'UE et dans certains pays tiers partenaires. Il atteste de l'identification, des vaccinations et de l'état de santé de l'animal."},{"cat":"Élevage","q":"Pourquoi la sélection intégrant à la fois aptitudes fonctionnelles et santé est-elle préférable à la sélection purement morphologique ?","a":{"A":"Parce que les aptitudes fonctionnelles sont les seuls critères objectivement mesurables et comparables entre individus","B":"Parce qu'elle produit des animaux plus grands, plus forts et plus adaptés à l'élevage en grands effectifs collectifs","C":"Parce qu'une sélection purement morphologique peut dériver vers des extrêmes nuisant à la santé et à la fonctionnalité","D":"Parce qu'elle est imposée réglementairement pour toutes les races de NAC inscrites au registre officiel français"},"ok":"C","expl":"Une sélection uniquement esthétique peut mener à des extrêmes morphologiques (brachycéphalisme, chondrodystrophie) nuisant à la santé. Intégrer santé et fonctionnalité garantit des animaux viables à long terme."}];
+
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+var QUESTIONS_PER_SESSION = 50;
+var SESSION_Q = [];
+var TOTAL = 50;
+
+// ═══════════════════════════════
+// ÉTAT
+// ═══════════════════════════════
+var currentQ = 0;
+var answered = false;
+var qTI = null; // question timer interval
+var rTI = null; // registration timer interval
+var rTimer = 60;
+var soloMode = false;
+var participants = {}; // { user: { coins, score, gift } }
+var votes = {A:[],B:[],C:[],D:[]};
+var MIN_COINS = 50;
+var SABO_COINS = 500;
+var AVCOLORS = ['#1d4ed8','#c2410c','#6d28d9','#0f766e','#b45309','#be185d','#1d7a3f','#0369a1'];
+
+// ═══════════════════════════════
+// SOCKET
+// ═══════════════════════════════
+var socket = null;
+try { socket = io(); } catch(e){}
+if(socket){
+  socket.on('connected', function(d){
+    document.getElementById('sConnect').style.display='none';
+    document.getElementById('sRegister').style.display='block';
+    document.getElementById('qStatus').textContent = '@'+d.username+' • LIVE 🔴';
+    startRegTimer();
+  });
+  socket.on('connectionError',function(d){
+    document.getElementById('cStatus').textContent='❌ '+d.message;
+  });
+  socket.on('quizGiftRegistration',function(d){
+    handleGift(d.username, d.giftName, d.coins);
+  });
+  socket.on('quizChatVote',function(d){
+    addVote(d.username, d.letter);
+    addChat('chatQ', d.username, d.letter, 'c-'+d.letter.toLowerCase());
+  });
+  socket.on('chatMessage',function(d){
+    addChat('chatQ', d.username, d.message, 'c-neutral');
+    addChat('regChat', d.username, d.message, 'c-neutral');
+  });
+}
+
+function doConnect(){
+  var u=document.getElementById('uInput').value.trim().replace('@','');
+  var s=document.getElementById('sessInput').value.trim();
+  var t=document.getElementById('idcInput').value.trim();
+  if(!u)return;
+  document.getElementById('cStatus').textContent='⏳ Connexion à @'+u+'...';
+  if(socket)socket.emit('connect_quiz',{username:u,sessionId:s,ttTargetIdc:t});
+}
+
+function startSolo(){
+  soloMode=true;
+  document.getElementById('sConnect').style.display='none';
+  document.getElementById('sRegister').style.display='block';
+  setTimeout(function(){handleGift('Filou92','Rose',69);},600);
+  setTimeout(function(){handleGift('CatoLover','TikTok',100);},1200);
+  setTimeout(function(){handleGift('DogMaster','Lion',500);},1800);
+  setTimeout(function(){handleGift('MiniChat','Glace',50);},2400);
+  startRegTimer();
+}
+
+// ═══════════════════════════════
+// INSCRIPTION
+// ═══════════════════════════════
+function startRegTimer(){
+  rTimer=60; updateRegTimer();
+  rTI=setInterval(function(){
+    rTimer--;updateRegTimer();
+    if(rTimer<=0){clearInterval(rTI);if(Object.keys(participants).length>0)launchQuiz();}
+  },1000);
+}
+function updateRegTimer(){
+  var el=document.getElementById('rTimer');
+  el.textContent=rTimer;
+  if(rTimer<=10)el.classList.add('urgent');
+  document.getElementById('rTimerSub').textContent=rTimer<=1?'seconde':'secondes';
+}
+
+function handleGift(user, giftName, coins){
+  // Pendant inscription : inscription si >= MIN_COINS
+  var quizActive = document.getElementById('sQuiz').style.display==='block' || (document.getElementById('sQuiz').className&&document.getElementById('sQuiz').className.indexOf('visible')!==-1);
+  
+  if(quizActive){
+    // Sabotage pendant le quiz
+    if(coins >= SABO_COINS){
+      sabotageLeader(user, giftName, coins);
+    }
+    return;
+  }
+  
+  if(participants[user]){
+    addChat('regChat',user,'✅ Déjà inscrit !','c-neutral');
+    return;
+  }
+  if(coins < MIN_COINS){
+    addChat('regChat',user,'🎁 '+giftName+' ('+coins+' coins) — minimum '+MIN_COINS+' coins requis !','c-neutral');
+    return;
+  }
+  participants[user]={coins:coins,score:0,gift:giftName};
+  addParticipantRow(user,giftName,coins);
+  addChat('regChat',user,'🎉 Inscrit avec '+giftName+' ('+coins+' coins) !','c-neutral');
+  updateRegUI();
+}
+
+function addParticipantRow(user,giftName,coins){
+  var list=document.getElementById('pList');
+  var empty=document.getElementById('pEmpty');
+  if(empty)empty.remove();
+  var col=AVCOLORS[Object.keys(participants).length%AVCOLORS.length];
+  var row=document.createElement('div');row.className='p-row';
+  row.innerHTML='<div class="p-av" style="background:'+col+'">'+user.charAt(0).toUpperCase()+'</div>'
+    +'<span class="p-name">'+esc(user)+'</span>'
+    +'<span class="p-gift">'+esc(giftName)+' • '+coins+' 🪙</span>';
+  list.appendChild(row);
+}
+
+function updateRegUI(){
+  var n=Object.keys(participants).length;
+  document.getElementById('pCount').textContent=n;
+  document.getElementById('tbBadge').textContent=n+' inscrit'+(n>1?'s':'');
+  document.getElementById('startBtn').disabled=n===0;
+  document.getElementById('startBtnSub').textContent='('+n+' participant'+(n>1?'s':'') +')';
+  document.getElementById('regStatus').textContent=n+' participant'+(n>1?'s':'')+' inscrit'+(n>1?'s':'');
+}
+
+// ═══════════════════════════════
+// LANCEMENT
+// ═══════════════════════════════
+function launchQuiz(){
+  clearInterval(rTI);
+  SESSION_Q = shuffle(ALL_QUESTIONS).slice(0, QUESTIONS_PER_SESSION);
+  TOTAL = SESSION_Q.length;
+  document.getElementById('sRegister').style.display='none';
+  document.getElementById('sQuiz').style.display='block';
+  showQ(0);
+}
+
+// ═══════════════════════════════
+// QUESTION
+// ═══════════════════════════════
+function showQ(i){
+  if(i>=TOTAL){showEnd();return;}
+  var q=SESSION_Q[i];
+  answered=false;
+  votes={A:[],B:[],C:[],D:[]};
+  document.getElementById('pFill').style.width=((i/TOTAL)*100)+'%';
+  document.getElementById('pLbl').textContent=(i+1)+' / '+TOTAL;
+  document.getElementById('tbBadge').textContent='Q '+(i+1)+'/'+TOTAL;
+  document.getElementById('qCat').textContent=q.cat;
+  document.getElementById('qTxt').textContent=q.q;
+  var grid=document.getElementById('answersGrid');grid.innerHTML='';
+  ['A','B','C','D'].forEach(function(l){
+    var btn=document.createElement('button');btn.className='ans';btn.setAttribute('data-l',l);
+    btn.innerHTML='<span class="ans-lbl">'+l+'</span><span class="ans-txt">'+esc(q.a[l])+'</span><span class="ans-votes" id="cnt-'+l+'">0 vote</span><div class="v-bar" id="bar-'+l+'" style="width:0%"></div>';
+    btn.onclick=function(){if(soloMode)reveal(l);else addVote('Moi',l);};
+    grid.appendChild(btn);
+  });
+  document.getElementById('expl').classList.remove('show');
+  document.getElementById('nextWrap').classList.remove('show');
+  var tEl=document.getElementById('qTimer');tEl.textContent=30;tEl.classList.remove('urgent');
+  var tv=30;
+  clearInterval(qTI);
+  qTI=setInterval(function(){
+    tv--;tEl.textContent=tv;
+    if(tv<=10)tEl.classList.add('urgent');
+    if(tv<=0){clearInterval(qTI);reveal(null);}
+  },1000);
+}
+
+function addVote(user,letter){
+  if(answered)return;
+  letter=letter.toUpperCase();
+  if(!votes[letter])return;
+  for(var l in votes)votes[l]=votes[l].filter(function(u){return u!==user;});
+  votes[letter].push(user);
+  refreshVoteBars();
+}
+
+function refreshVoteBars(){
+  var tot=votes.A.length+votes.B.length+votes.C.length+votes.D.length||1;
+  ['A','B','C','D'].forEach(function(l){
+    var n=votes[l].length;var pct=Math.round(n/tot*100);
+    var c=document.getElementById('cnt-'+l);var b=document.getElementById('bar-'+l);
+    if(c)c.textContent=n+' vote'+(n>1?'s':'')+' ('+pct+'%)';
+    if(b)b.style.width=pct+'%';
+  });
+}
+
+function reveal(sel){
+  if(answered)return;
+  answered=true;clearInterval(qTI);
+  var q=SESSION_Q[currentQ];
+  document.getElementById('qTimer').textContent='✓';
+  document.getElementById('qTimer').classList.remove('urgent');
+  refreshVoteBars();
+  ['A','B','C','D'].forEach(function(l){
+    var btn=document.querySelector('[data-l="'+l+'"]');if(!btn)return;
+    btn.disabled=true;
+    if(l===q.ok)btn.classList.add('correct');
+    else if(l===sel)btn.classList.add('wrong');
+  });
+  document.getElementById('explTxt').textContent=q.expl;
+  document.getElementById('expl').classList.add('show');
+  document.getElementById('nextWrap').classList.add('show');
+  // Points
+  votes[q.ok].forEach(function(u){if(participants[u])participants[u].score+=10;});
+  refreshLB();
+}
+
+function nextQ(){currentQ++;showQ(currentQ);}
+
+// ═══════════════════════════════
+// SABOTAGE
+// ═══════════════════════════════
+function sabotageLeader(sender, giftName, coins){
+  var sorted=getSorted();
+  if(sorted.length===0)return;
+  var leader=sorted[0];
+  if(leader[0]===sender){
+    // S'attaque à lui-même, vise le 2e
+    if(sorted.length<2)return;
+    leader=sorted[1];
+  }
+  var old=participants[leader[0]].score;
+  participants[leader[0]].score=Math.max(0, old-10);
+  
+  // Notification visible
+  showSaboNotif('⚡ '+sender+' sabote @'+leader[0]+' ! -10 pts');
+  addChat('chatQ', sender, '⚡ Sabotage sur @'+leader[0]+' ! (-10 pts)', 'c-sabo');
+  refreshLB();
+}
+
+function showSaboNotif(msg){
+  var existing=document.querySelector('.sabo-notif');
+  if(existing)existing.remove();
+  var el=document.createElement('div');el.className='sabo-notif';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3000);
+}
+
+// ═══════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════
+function getSorted(){
+  return Object.entries(participants).sort(function(a,b){return b[1].score-a[1].score;});
+}
+var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣'];
+function refreshLB(){
+  var rows=getSorted().slice(0,5);if(!rows.length)return;
+  document.getElementById('lb').classList.add('show');
+  document.getElementById('lbRows').innerHTML=rows.map(function(r,i){
+    return '<div class="lb-row"><span class="lb-rank">'+MEDALS[i]+'</span><span class="lb-name">'+esc(r[0])+'</span><span class="lb-score">'+r[1].score+' pts</span></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════
+// FIN
+// ═══════════════════════════════
+function showEnd(){
+  document.getElementById('sQuiz').style.display='none';
+  document.getElementById('sEnd').classList.add('show');
+  var sorted=getSorted();
+  var n=sorted.length;
+  document.getElementById('statP').textContent=n;
+  document.getElementById('statQ').textContent=TOTAL;
+  document.getElementById('statTop').textContent=n>0?sorted[0][1].score:0;
+  
+  if(n>0){
+    var champ=sorted[0];
+    document.getElementById('champCard').style.display='block';
+    var col=AVCOLORS[0];
+    document.getElementById('champAv').style.background=col;
+    document.getElementById('champAv').textContent=champ[0].charAt(0).toUpperCase();
+    document.getElementById('champName').textContent=champ[0];
+    document.getElementById('champScore').textContent=champ[1].score+' points';
+    var pct=TOTAL>0?Math.round(champ[1].score/TOTAL/10*100):0;
+    document.getElementById('champDetail').textContent=pct+'% de bonnes réponses • '+champ[1].gift;
+    document.getElementById('endSub').textContent='🎉 Félicitations à '+champ[0]+' !';
+  } else {
+    document.getElementById('endSub').textContent='Merci à tous les participants !';
+  }
+  
+  if(sorted.length>1){
+    document.getElementById('podium3').style.display='block';
+    document.getElementById('podRows').innerHTML=sorted.slice(0,3).map(function(r,i){
+      var col=AVCOLORS[i];
+      var pct=TOTAL>0?Math.round(r[1].score/TOTAL/10*100):0;
+      return '<div class="pod-row"><div class="pod-med">'+MEDALS[i]+'</div><div class="pod-av" style="background:'+col+'">'+r[0].charAt(0).toUpperCase()+'</div><div class="pod-info"><div class="pod-name">'+esc(r[0])+'</div><div class="pod-detail">'+pct+'% correct</div></div><div class="pod-pts">'+r[1].score+' pts</div></div>';
+    }).join('');
+  }
+  
+  setTimeout(launchConfetti, 400);
+}
+
+// ═══════════════════════════════
+// CONFETTIS
+// ═══════════════════════════════
+function launchConfetti(){
+  var cv=document.getElementById('confetti');
+  var ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  var pieces=[];
+  var colors=['#2d5a27','#b87c00','#1d4ed8','#c2410c','#6d28d9','#be185d','#e63b2e'];
+  var shapes=['rect','circle','star'];
+  for(var i=0;i<180;i++){
+    pieces.push({x:Math.random()*cv.width,y:-20-Math.random()*200,w:8+Math.random()*10,h:5+Math.random()*7,
+    color:colors[Math.floor(Math.random()*colors.length)],shape:shapes[Math.floor(Math.random()*shapes.length)],
+    vx:(Math.random()-.5)*4,vy:2+Math.random()*4,rot:Math.random()*Math.PI*2,
+    rotS:(Math.random()-.5)*.15,op:1,fade:.004+Math.random()*.006});
+  }
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);var alive=false;
+    pieces.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotS;p.op-=p.fade;
+      if(p.op>0){alive=true;ctx.save();ctx.globalAlpha=Math.max(0,p.op);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;
+        if(p.shape==='rect')ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+        else if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}
+        else{ctx.beginPath();for(var s=0;s<5;s++){var a=(s*4*Math.PI/5)-Math.PI/2;var r=s%2===0?p.w/2:p.w/4;if(s===0)ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);else ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();ctx.fill();}
+        ctx.restore();}
+    });
+    if(alive)requestAnimationFrame(draw);else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  draw();
+  setTimeout(function(){
+    for(var j=0;j<80;j++)pieces.push({x:Math.random()*cv.width,y:-20-Math.random()*100,w:6+Math.random()*8,h:4+Math.random()*6,
+    color:colors[Math.floor(Math.random()*colors.length)],shape:shapes[Math.floor(Math.random()*shapes.length)],
+    vx:(Math.random()-.5)*3,vy:1.5+Math.random()*3,rot:Math.random()*Math.PI*2,
+    rotS:(Math.random()-.5)*.12,op:1,fade:.005+Math.random()*.007});
+  },1000);
+}
+
+// ═══════════════════════════════
+// RESTART
+// ═══════════════════════════════
+function doRestart(){
+  currentQ=0;answered=false;participants={};votes={A:[],B:[],C:[],D:[]};
+  document.getElementById('sEnd').classList.remove('show');
+  document.getElementById('pList').innerHTML='<div class="p-empty" id="pEmpty">En attente de cadeaux... 🎁</div>';
+  document.getElementById('pCount').textContent='0';
+  document.getElementById('tbBadge').textContent='0 inscrit';
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('startBtnSub').textContent='(0 participant)';
+  document.getElementById('lb').classList.remove('show');
+  document.getElementById('sQuiz').style.display='none';
+  document.getElementById('sRegister').style.display='block';
+  document.getElementById('rTimer').classList.remove('urgent');
+  startRegTimer();
+}
+
+// ═══════════════════════════════
+// CHAT
+// ═══════════════════════════════
+function addChat(id,user,text,cls){
+  var el=document.getElementById(id);if(!el)return;
+  var col=AVCOLORS[Math.floor(Math.random()*AVCOLORS.length)];
+  var d=document.createElement('div');d.className='c-msg';
+  d.innerHTML='<div class="c-av" style="background:'+col+'">'+esc(user).charAt(0).toUpperCase()+'</div>'
+    +'<div><div class="c-user">'+esc(user)+'</div><div class="c-txt '+cls+'">'+esc(text)+'</div></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+  while(el.children.length>40)el.removeChild(el.firstChild);
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
