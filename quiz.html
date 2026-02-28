@@ -182,6 +182,36 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 .s-txt{font-size:11px;font-weight:500;color:var(--muted)}
 
+/* ═══ MENU PARAMÈTRES ═══ */
+.settings-btn{background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;transition:border-color .15s,color .15s}
+.settings-btn:hover{border-color:var(--ink);color:var(--ink)}
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center}
+.settings-overlay.open{display:flex}
+.settings-sheet{background:white;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.s-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.s-hd h3{font-family:"DM Serif Display",serif;font-size:22px}
+.s-close{background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.s-section{margin-bottom:24px}
+.s-section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px}
+.s-row-left{flex:1}
+.s-row-label{font-size:13px;font-weight:600;color:var(--ink)}
+.s-row-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.s-input{width:80px;background:white;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:700;text-align:center;color:var(--ink);outline:none}
+.s-input:focus{border-color:var(--green)}
+.s-modos-list{margin-top:6px;display:flex;flex-direction:column;gap:6px}
+.s-modo-row{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.s-modo-name{font-size:13px;font-weight:600;flex:1}
+.s-modo-remove{background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted);padding:0;line-height:1}
+.s-modo-remove:hover{color:var(--red)}
+.s-modo-add{display:flex;gap:8px;margin-top:8px}
+.s-modo-add-inp{flex:1;background:white;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-family:"DM Sans",sans-serif;font-size:13px;outline:none}
+.s-modo-add-inp:focus{border-color:var(--green)}
+.s-modo-add-btn{background:var(--green);border:none;border-radius:8px;padding:8px 14px;color:white;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.s-save{width:100%;background:var(--ink);border:none;border-radius:10px;padding:13px;color:white;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.s-saved{text-align:center;font-size:12px;color:var(--green);font-weight:600;min-height:18px;margin-top:6px}
+
 /* ═══ STEP END ═══ */
 #sEnd{display:none;position:relative;overflow:hidden}
 #sEnd.show{display:block}
@@ -239,7 +269,10 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
       <div class="tb-div"></div>
       <div class="tb-title">🐾 Quiz Chiens & Chats</div>
     </div>
-    <div class="tb-badge" id="tbBadge">0 inscrits</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="settings-btn" onclick="openSettings()">⚙️ Paramètres</button>
+      <div class="tb-badge" id="tbBadge">0 inscrits</div>
+    </div>
   </div>
 
   <!-- ═══ ÉTAPE 1 : CONNEXION ═══ -->
@@ -276,7 +309,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
       <div class="rule-ico">🎁</div>
       <div>
         <div class="rule-ttl">Pour s'inscrire</div>
-        <div class="rule-txt">Envoie un cadeau de <strong>50 coins minimum</strong> pour rejoindre le quiz !</div>
+        <div class="rule-txt">Envoie un cadeau de <strong id="ruleMinCoins">1 coin minimum</strong> pour rejoindre le quiz !</div>
       </div>
     </div>
 
@@ -284,7 +317,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
       <div class="rule-ico">⚡</div>
       <div>
         <div class="sabotage-ttl">Pouvoir de sabotage</div>
-        <div class="sabotage-txt">Envoie un cadeau de <strong>500 coins ou plus</strong> pendant le quiz pour faire perdre <strong>-10 pts</strong> au joueur en tête !</div>
+        <div class="sabotage-txt">Envoie un cadeau de <strong id="ruleSaboCoins">500 coins ou plus</strong> pendant le quiz pour faire perdre <strong>-10 pts</strong> au joueur en tête !</div>
       </div>
     </div>
 
@@ -384,6 +417,54 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink)}
     </div>
   </div>
 
+
+<!-- ═══ SETTINGS PANEL ═══ -->
+<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-sheet">
+    <div class="s-hd">
+      <h3>⚙️ Paramètres</h3>
+      <button class="s-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="s-section">
+      <div class="s-section-title">💰 Points d'inscription</div>
+      <div class="s-row">
+        <div class="s-row-left">
+          <div class="s-row-label">Coins minimum pour s'inscrire</div>
+          <div class="s-row-sub">Valeur en coins TikTok du cadeau</div>
+        </div>
+        <input class="s-input" type="number" id="sMinCoins" min="1" value="1" />
+      </div>
+      <div class="s-row">
+        <div class="s-row-left">
+          <div class="s-row-label">Coins minimum pour saboter</div>
+          <div class="s-row-sub">Cadeau envoyé pendant le quiz</div>
+        </div>
+        <input class="s-input" type="number" id="sSaboCoins" min="1" value="500" />
+      </div>
+      <div class="s-row">
+        <div class="s-row-left">
+          <div class="s-row-label">Durée d'inscription (secondes)</div>
+          <div class="s-row-sub">Temps avant le démarrage auto</div>
+        </div>
+        <input class="s-input" type="number" id="sRegDuration" min="10" max="300" value="60" />
+      </div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-section-title">👑 Modérateurs (inscrits automatiquement)</div>
+      <div class="s-modos-list" id="modosList"></div>
+      <div class="s-modo-add">
+        <input class="s-modo-add-inp" id="modoInput" placeholder="@pseudo_modo" onkeydown="if(event.key===&apos;Enter&apos;)addModo()" />
+        <button class="s-modo-add-btn" onclick="addModo()">+ Ajouter</button>
+      </div>
+    </div>
+
+    <button class="s-save" onclick="saveSettings()">✅ Enregistrer</button>
+    <div class="s-saved" id="sSaved"></div>
+  </div>
+</div>
+
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -415,9 +496,80 @@ var rTimer = 60;
 var soloMode = false;
 var participants = {}; // { user: { coins, score, gift } }
 var votes = {A:[],B:[],C:[],D:[]};
-var MIN_COINS = 50;
+var MIN_COINS = 1;
+var rTimerMax = 60;
 var SABO_COINS = 500;
 var AVCOLORS = ['#1d4ed8','#c2410c','#6d28d9','#0f766e','#b45309','#be185d','#1d7a3f','#0369a1'];
+
+// ═══════════════════════════════
+// ⚙️ PARAMÈTRES & MODÉRATEURS
+// ═══════════════════════════════
+var MODOS = []; // liste des pseudos modos
+
+function openSettings(){
+  // Synchro les valeurs dans le formulaire
+  document.getElementById('sMinCoins').value   = MIN_COINS;
+  document.getElementById('sSaboCoins').value  = SABO_COINS;
+  document.getElementById('sRegDuration').value = rTimerMax || 60;
+  renderModosList();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+function renderModosList(){
+  var list = document.getElementById('modosList');
+  if(!MODOS.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:4px 0">Aucun modérateur ajouté</div>'; return; }
+  list.innerHTML = MODOS.map(function(m,i){
+    return '<div class="s-modo-row"><span class="s-modo-name">'+esc(m)+'</span><button class="s-modo-remove" onclick="removeModo('+i+')">✕</button></div>';
+  }).join('');
+}
+
+function addModo(){
+  var inp = document.getElementById('modoInput');
+  var val = inp.value.trim().replace('@','').toLowerCase();
+  if(!val) return;
+  if(MODOS.indexOf(val) === -1) MODOS.push(val);
+  inp.value = '';
+  renderModosList();
+}
+
+function removeModo(i){
+  MODOS.splice(i,1);
+  renderModosList();
+}
+
+function saveSettings(){
+  var mc = parseInt(document.getElementById('sMinCoins').value) || 1;
+  var sc = parseInt(document.getElementById('sSaboCoins').value) || 500;
+  var rd = parseInt(document.getElementById('sRegDuration').value) || 60;
+  MIN_COINS   = Math.max(1, mc);
+  SABO_COINS  = Math.max(1, sc);
+  rTimerMax   = Math.max(10, rd);
+  // Met à jour les textes de règles
+  var rc = document.getElementById('ruleMinCoins');
+  var rs = document.getElementById('ruleSaboCoins');
+  if(rc) rc.textContent = MIN_COINS + ' coin' + (MIN_COINS>1?'s':'')+' minimum';
+  if(rs) rs.textContent = SABO_COINS + ' coins ou plus';
+  // Feedback
+  var saved = document.getElementById('sSaved');
+  saved.textContent = '✅ Paramètres enregistrés !';
+  setTimeout(function(){ saved.textContent=''; closeSettings(); }, 1200);
+}
+
+// Auto-inscription des modos quand ils apparaissent dans le chat
+function checkModoAutoRegister(user){
+  var u = user.toLowerCase().replace('@','');
+  if(MODOS.indexOf(u) === -1) return;
+  if(participants[u]) return; // déjà inscrit
+  var quizActive = document.getElementById('sQuiz').style.display==='block';
+  if(quizActive) return; // trop tard
+  participants[u] = {coins:0, score:0, gift:'👑 Modo'};
+  addParticipantRow(user, '👑 Modo', 0);
+  addChat('regChat', user, '👑 Modo inscrit automatiquement !', 'c-neutral');
+  updateRegUI();
+}
 
 // ═══════════════════════════════
 // SOCKET
@@ -438,10 +590,12 @@ if(socket){
     handleGift(d.username, d.giftName, d.coins);
   });
   socket.on('quizChatVote',function(d){
+    checkModoAutoRegister(d.username);
     addVote(d.username, d.letter);
     addChat('chatQ', d.username, d.letter, 'c-'+d.letter.toLowerCase());
   });
   socket.on('chatMessage',function(d){
+    checkModoAutoRegister(d.username);
     addChat('chatQ', d.username, d.message, 'c-neutral');
     addChat('regChat', d.username, d.message, 'c-neutral');
   });
@@ -471,7 +625,7 @@ function startSolo(){
 // INSCRIPTION
 // ═══════════════════════════════
 function startRegTimer(){
-  rTimer=60; updateRegTimer();
+  rTimer=rTimerMax||60; updateRegTimer();
   rTI=setInterval(function(){
     rTimer--;updateRegTimer();
     if(rTimer<=0){clearInterval(rTI);if(Object.keys(participants).length>0)launchQuiz();}
