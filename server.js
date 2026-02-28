@@ -26,7 +26,6 @@ const serverHttp = http.createServer(app);
 const io         = new Server(serverHttp);
 
 // Fichiers statiques
-app.use(express.static(__dirname));
 app.use(express.static(process.cwd()));
 
 app.get('/', (req, res) => {
